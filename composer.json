@@ -1,0 +1,49 @@
+{
+    "name": "towebgmbh/laravel-kit",
+    "description": "A spec-driven development (SDD) kit for Laravel projects that use Laravel Boost.",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": "^8.3",
+        "illuminate/console": "^12.0|^13.0",
+        "illuminate/support": "^12.0|^13.0",
+        "laravel/boost": "^2.10",
+        "sebastian/diff": "^6.0|^7.0|^8.0|^9.0",
+        "symfony/process": "^7.2|^8.0"
+    },
+    "require-dev": {
+        "laravel/pint": "^1.27",
+        "orchestra/testbench": "^10.0|^11.0",
+        "pestphp/pest": "^3.8|^4.1|^5.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Towebgmbh\\LaravelKit\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Towebgmbh\\LaravelKit\\KitServiceProvider"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "pest",
+        "lint": "pint",
+        "test:lint": "pint --test"
+    },
+    "config": {
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        },
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
