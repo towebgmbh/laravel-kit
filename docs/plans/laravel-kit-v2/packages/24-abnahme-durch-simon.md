@@ -2,7 +2,7 @@
 
 # Package 24: Abnahme durch Simon
 
-Kind: acceptance · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: acceptance · Status: done · Model: opus · Effort: medium · Commits: none · Verdict: pass
 
 ## Spec
 
@@ -64,3 +64,90 @@ None.
 - Code changes of any kind.
 - Anything under `docs/plans/` (Jarvis's plan copy, see above).
 - Tag, release and Packagist registration (D-17).
+
+## Report
+
+Acceptance prepared. Pest 268 passed / 2 skipped, Pint clean, drift tests 2 passed, smoke PASS fresh and upgrade (Laravel 13, Boost 2.10.4). Checked the guide steps by hand in the kept smoke apps: CLAUDE.md/AGENTS.md sections, no "# Pest", the five kit-* skills, the size rule, FEATURE_TEMPLATE with Open Questions and AC-1, settings.json with two Stop hooks and no PostToolUse, second kit:install with unchanged/exists, kit:update with a diff and the local edit kept, kit:doctor all OK, upgrade report, project rule moved, services mode in CLAUDE.md. Also checked the README sections and the workflow triggers. No tracked files changed; the work directory is deleted.
+
+## Handoff
+
+No changes. Code is accepted locally on PHP 8.5 / Laravel 13 / Boost 2.10.4. Open before the push: Jarvis cleans docs/plans and the history of customer names (AC-12) and runs the name search. The GitHub matrix (Laravel 12, Boost 2.10.0, PHP 8.3/8.4), the smoke CI job and boost-drift.yml only run after the push.
+
+## Decisions
+
+- Ran the smoke script as `bash scripts/smoke.sh --keep` with its output in a log file, so I could check the guide steps in the kept apps. Then I deleted the work directory.
+- Ran kit:update with --no-interaction instead of answering 'no' interactively: the local edit was kept (skipped) after the diff was shown. The interactive question is covered by UpdateCommandTest.
+- Ran no name search and reported nothing under docs/plans, as the spec says; AC-12 is Jarvis's step before the push.
+- Ran Pest a second time without a pipe so the exit code is recorded; the result was the same.
+
+## Checks
+
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; vendor/bin/pest --compact --colors=never`: exit 0, 268 passed, 2 skipped (929 assertions)
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; vendor/bin/pint --test`: exit 0, pint passed
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; KIT_BOOST_DRIFT=1 vendor/bin/pest tests/Drift --colors=never`: exit 0, 2 passed
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; bash scripts/smoke.sh --keep > /tmp/kit-smoke-acceptance.log 2>&1; echo "exit=$?"; grep -nE 'PASS|FAIL|WARN|Work directory' /tmp/kit-smoke-acceptance.log`: exit 0, exit=0, PASS: fresh, PASS: upgrade
+
+## Test guide
+
+# Abnahme Laravel Kit v2
+
+Kein Login, keine URL und kein Herd: Es ist ein Composer-Paket (D-17). Du arbeitest im Terminal im Checkout des Branches `jarvis/laravel-kit-v2`. Falls `php` oder `composer` fehlen: `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"`.
+
+Der Smoke-Test braucht Netz und Composer. Mit `--keep` gibt er am Ende `Work directory kept: <work>` aus. `<work>` steht in den Schritten unten für diesen Pfad.
+
+## 1. AC-1: Tests und Stil
+`composer install && vendor/bin/pest && vendor/bin/pint --test`
+-> alle Tests grün (268 passed, 2 skipped), Pint meldet `passed`. Auf GitHub ist nach dem Push der letzte Lauf "tests" im PR grün, für alle Matrix-Jobs (PHP 8.3/8.4, Laravel 12/13, Boost lowest/latest) und für den Job `smoke`.
+**Lokal geprüft** (PHP 8.5, Laravel 13, Boost 2.10.4). Die Matrix auf GitHub läuft erst nach dem Push.
+
+## 2. AC-2, AC-9, AC-13: Guidelines, Skills, Kontextbudget
+`vendor/bin/pest tests/Feature/Guidelines tests/Feature/Skills`
+-> grün, auch `ContextBudgetTest`. **Geprüft** (Teil der ganzen Suite).
+
+## 3. AC-3: frische App
+`bash scripts/smoke.sh --keep --scenario=fresh` -> `PASS: fresh`.
+Öffne `<work>/fresh/CLAUDE.md` und `<work>/fresh/AGENTS.md`. Dort stehen `=== towebgmbh/laravel-kit/core rules ===`, "Stack: Livewire 4 with Flux" und "Follow the Laravel Kit test line:". Es gibt keinen Abschnitt `# Pest`, weil die frische App PHPUnit nutzt.
+`ls <work>/fresh/.claude/skills` zeigt kit-brief, kit-docs-split, kit-onboard, kit-review und kit-spec, daneben Boosts eigene Skills. **Geprüft.**
+
+## 4. AC-14: Grössenregel und Spec-Template
+In `<work>/fresh/CLAUDE.md` steht "Classify every piece of work as small, medium or large…" mit den Stufen Small, Medium und Large. In `.claude/skills/kit-spec/FEATURE_TEMPLATE.md` stehen "## Open Questions" und "## Acceptance Criteria" mit `AC-1`. **Geprüft.**
+
+## 5. AC-4, AC-6: Hooks und kein Überschreiben
+In `<work>/fresh/.claude/settings.json` stehen zwei `Stop`-Hooks (`vendor/bin/pint --dirty --format agent` und `.claude/hooks/kit-docs-guard.sh`) und kein `PostToolUse`.
+`php artisan kit:install --stack=livewire --new --no-interaction` noch einmal ausführen -> die verwalteten Dateien sind `unchanged`, `config/kit.php` und die drei Doku-Dateien `exists`, `pest/core` ist `not needed`. **Geprüft.**
+Optional: Claude Code in `<work>/fresh` öffnen und eine neue Action-Datei ohne Doku anlegen lassen. Der Agent wird einmal zurückgeschickt. Ändert er nur eine Zeile in einer bestehenden Datei, läuft er ohne Unterbrechung durch. **Nicht von Hand geprüft**, das deckt `DocsGuardTest` ab.
+
+## 6. AC-5: kit:update
+In `<work>/fresh` eine Zeile an `.ai/guidelines/enforce-tests.blade.php` anhängen und `php artisan kit:update` ausführen -> ein Diff (yours/kit) und die Frage, ob die Datei ersetzt werden soll. Mit "no" antworten: Deine Änderung bleibt, danach läuft `boost:update`.
+**Geprüft** mit `--no-interaction` (Diff, `skipped`, die Änderung blieb). Die interaktive Frage deckt `UpdateCommandTest` ab.
+
+## 7. AC-8: kit:doctor
+`php artisan kit:doctor` in `<work>/fresh` (vorher deine Änderung aus Schritt 6 zurücknehmen) -> nur `[OK]`-Zeilen: Boost 2.10.4, Paket aktiv, Manifest, Config, keine v1-Reste, Override passt. Die Smoke-Ausgabe hat vorher mit einem manipulierten Manifest `[FAIL] Override drift` mit Exit 1 geprüft. **Geprüft.**
+
+## 8. AC-7: Upgrade von v1
+`bash scripts/smoke.sh --keep --scenario=upgrade` -> `PASS: upgrade`.
+- `<work>/upgrade/.ai/kit-upgrade/v1/REPORT.md` enthält den Diff von `04-testing.md`.
+- `.ai/guidelines/project/07-project-rules.md` ist da.
+- `<work>/upgrade/CLAUDE.md` enthält "This project keeps its Service classes."
+- `laravel-claude-kit/` und die v1-Skills sind weg, `docs/GUIDELINES.md` ist unverändert.
+
+**Geprüft.**
+
+## 9. AC-10: wöchentlicher Drift-Lauf
+`KIT_BOOST_DRIFT=1 vendor/bin/pest tests/Drift` -> 2 passed. `.github/workflows/boost-drift.yml` hat `schedule` (montags 06:00) und `workflow_dispatch`. Auf GitHub lässt sich der Lauf erst nach dem Merge in `main` von Hand starten. **Lokal geprüft.**
+
+## 10. AC-11: README
+In `README.md` gibt es die Abschnitte "Installation", "Commands", "Updating" und "Upgrading from v1". **Geprüft** (die Abschnitte sind da; den Inhalt liest du selbst).
+
+## 11. AC-12: keine Kundennamen
+Das ist Jarvis' Schritt: Direkt vor Push und PR prüft Jarvis den Branch (Dateien, jeden Commit, die Commit-Nachrichten) und bereinigt `docs/plans` samt Historie. Jarvis meldet dir das Ergebnis. Du musst hier nichts tun.
+
+## 12. Aufräumen
+`rm -rf <work>`. Den Tag `v2.0.0` und die Registrierung auf Packagist machst du selbst (D-17).
+
+## Grenzen
+- Lokal lief nur PHP 8.5, Laravel 13 und Boost 2.10.4. Laravel 12, Boost 2.10.0, PHP 8.3/8.4 und die GitHub-Workflows laufen erst nach dem Push.
+- Den Doku-Wächter in einer echten Claude-Code-Sitzung habe ich nicht von Hand geprüft.
+
+## Offene Befunde
+Keine blockierenden. Aus dem Review ist ein kleiner Punkt bekannt, aber nicht blockierend: `kit:doctor` empfiehlt Projekten ohne v1-Versionsdatei, eigene `.claude/rules`-Dateien zu entfernen ("Remove them"). Das ist nur eine Warnung mit Exit 0.

@@ -191,3 +191,9 @@
 - Rated the .claude/rules 'Remove them' hint non-blocking: warning only, exit 0 per D-27.
 - Only Laravel 13 / Boost 2.10.4 ran locally; Laravel 12, Boost 2.10.0 and the GitHub workflows were not run.
 - Did not run the shell wrapper stub by hand; it is unchanged since package 10 and the smoke test installs it.
+
+## Package 24: Abnahme durch Simon
+- Ran the smoke script as `bash scripts/smoke.sh --keep` with its output in a log file, so I could check the guide steps in the kept apps. Then I deleted the work directory.
+- Ran kit:update with --no-interaction instead of answering 'no' interactively: the local edit was kept (skipped) after the diff was shown. The interactive question is covered by UpdateCommandTest.
+- Ran no name search and reported nothing under docs/plans, as the spec says; AC-12 is Jarvis's step before the push.
+- Ran Pest a second time without a pipe so the exit code is recorded; the result was the same.
