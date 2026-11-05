@@ -177,9 +177,13 @@ class UpgradeCommand extends Command
         $derived = (new ArchitectureResolver)->resolve($basePath);
 
         if ($derived !== null) {
-            $source = is_file($basePath.'/'.ArchitectureResolver::GUIDELINES)
-                ? 'derived from "Deviations from Kit Rules" in '.ArchitectureResolver::GUIDELINES
-                : 'default, no '.ArchitectureResolver::GUIDELINES;
+            $guidelines = $basePath.'/'.ArchitectureResolver::GUIDELINES;
+
+            $source = match (true) {
+                ! is_file($guidelines) => 'default, no '.ArchitectureResolver::GUIDELINES,
+                (new ArchitectureResolver)->deviations((string) file_get_contents($guidelines)) === null => 'default, no Deviations section in '.ArchitectureResolver::GUIDELINES,
+                default => 'derived from "Deviations from Kit Rules" in '.ArchitectureResolver::GUIDELINES,
+            };
 
             return [$derived, $source];
         }

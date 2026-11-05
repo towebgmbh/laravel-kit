@@ -185,6 +185,15 @@ it('derives actions from the unchanged v1 guidelines template', function () {
         ->and(file_get_contents($this->fixture->path('CLAUDE.md')))->toContain('Business logic lives in Actions.');
 });
 
+it('labels the default architecture when GUIDELINES.md has no Deviations section', function () {
+    $this->fixture = kitUpgradeFixture();
+    $this->fixture->put('docs/GUIDELINES.md', "# Guidelines\n\n## Architecture\n\nUses services.\n");
+
+    $this->artisan('kit:upgrade', ['--dry-run' => true, '--no-interaction' => true])
+        ->expectsOutputToContain('Architecture: actions (default, no Deviations section in docs/GUIDELINES.md)')
+        ->assertSuccessful();
+});
+
 it('fails without a v1 kit', function () {
     $this->fixture = kitUpgradeFixture();
     unlink($this->fixture->path('.claude/.kit-version'));

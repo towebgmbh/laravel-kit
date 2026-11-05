@@ -77,6 +77,17 @@ it('warns about v1 leftovers', function () {
         ->assertSuccessful();
 });
 
+it('warns about v1 skills, template and kit copy without a version file', function () {
+    $this->fixture = kitDoctorFixture();
+    $this->fixture->put('.claude/skills/review/SKILL.md', '# review');
+    $this->fixture->put('.claude/templates/FEATURE_TEMPLATE.md', '# template');
+    $this->fixture->put('laravel-claude-kit/install.sh', '#!/bin/sh');
+
+    $this->artisan('kit:doctor')
+        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/skills/review/SKILL.md, .claude/templates/FEATURE_TEMPLATE.md, laravel-claude-kit/install.sh. Run php artisan kit:upgrade.')
+        ->assertSuccessful();
+});
+
 it('warns about a pest override without Pest', function () {
     $this->fixture = kitDoctorFixture(pest: false);
     $this->fixture->put('.ai/guidelines/pest/core.blade.php', 'x');

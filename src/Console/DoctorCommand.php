@@ -123,6 +123,20 @@ class DoctorCommand extends Command
             $found[] = UpgradePlan::RULES_DIR.'/'.basename($file);
         }
 
+        foreach ((new V1Inventory)->paths() as $path) {
+            if (str_starts_with($path, UpgradePlan::RULES_DIR.'/')) {
+                continue;
+            }
+
+            if (is_file($basePath.'/'.$path)) {
+                $found[] = $path;
+            }
+        }
+
+        if (is_file($basePath.'/'.UpgradePlan::KIT_COPY.'/install.sh')) {
+            $found[] = UpgradePlan::KIT_COPY.'/install.sh';
+        }
+
         if (is_file($basePath.'/'.V1Inventory::VERSION_FILE)) {
             $found[] = V1Inventory::VERSION_FILE;
         }

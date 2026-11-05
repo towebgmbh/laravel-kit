@@ -74,7 +74,7 @@ Boost renders `enforce-tests` only for projects with enough tests. The kit sets 
 | `kit-onboard` | Existing project: analyse with Boost's `infer-conventions`, ask at most 6 to 8 questions (always including the architecture decision), write docs, `config/kit.php` and deviations to `.ai/rules`, and migrate foreign docs with a dry run. New project: ask the basics and build the shell (domain folders, docs with a feature backlog, ADR-001 for the stack, architecture tests, `pint.json`, a GitHub workflow). |
 | `kit-spec` | Write a feature spec with numbered criteria and open questions |
 | `kit-review` | Review a change against Boost's best practices, the spec status, criteria coverage and docs drift |
-| `kit-brief` | Turn the spec and backlog into a brief for a larger piece of work |
+| `kit-brief` | Summarise the project state at the start of a session (read-only) |
 | `kit-docs-split` | Switch the docs from the flat to the split layout |
 
 ## Claude Code hooks
@@ -116,7 +116,7 @@ It derives `kit.architecture` from "Deviations from Kit Rules" in `docs/GUIDELIN
 
 ## How it works with Boost
 
-Boost reads `resources/boost/guidelines/` and `resources/boost/skills/` of every direct Composer dependency, filtered by the `packages` list in `boost.json`; `kit:install` adds the kit there. Boost writes the guidelines to `CLAUDE.md` when that file exists and to `AGENTS.md` otherwise, and copies the skills to each agent's skills folder.
+Boost reads `resources/boost/guidelines/` and `resources/boost/skills/` of every direct Composer dependency, filtered by the `packages` list in `boost.json`; `kit:install` adds the kit there. For Claude Code, Boost writes the guidelines to `CLAUDE.md` when that file exists and to `AGENTS.md` otherwise; Codex and other agents use their own files such as `AGENTS.md`. Boost copies the skills to each agent's skills folder.
 
 A file in `.ai/guidelines/` replaces the built-in Boost text of the same relative path. A package cannot do that, so `kit:install` writes the two overrides into the project. `.ai/kit-manifest.json` stores the hash of each Boost file an override replaces. `kit:doctor` compares it with the installed Boost, and a weekly workflow checks the newest Boost release.
 
