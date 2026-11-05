@@ -1,6 +1,6 @@
 <!-- Jarvis maintains this file and overwrites it before every work package. Change the plan on the initiative page in Jarvis. -->
 
-# Package 16: Schluss-Review gegen alle Abnahmekriterien
+# Package 18: Schluss-Review gegen alle Abnahmekriterien
 
 Kind: review · Status: pending · Model: opus · Effort: high · Commits: – · Verdict: –
 

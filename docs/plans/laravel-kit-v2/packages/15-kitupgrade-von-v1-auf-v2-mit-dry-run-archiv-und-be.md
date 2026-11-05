@@ -1,6 +1,6 @@
 <!-- Jarvis maintains this file and overwrites it before every work package. Change the plan on the initiative page in Jarvis. -->
 
-# Package 13: kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht
+# Package 15: kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht
 
 Kind: implement · Status: pending · Model: opus · Effort: high · Commits: – · Verdict: –
 

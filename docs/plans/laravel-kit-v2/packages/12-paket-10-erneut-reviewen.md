@@ -2,7 +2,7 @@
 
 # Package 12: Paket 10 erneut reviewen
 
-Kind: review · Status: running · Model: opus · Effort: high · Commits: – · Verdict: –
+Kind: review · Status: done · Model: opus · Effort: high · Commits: none · Verdict: blocking
 
 ## Spec
 
@@ -56,3 +56,63 @@ None; this package only reviews.
 - Packages 11 to 13 (not built yet).
 
 Check that the findings of the previous review were fixed.
+
+## Report
+
+I re-reviewed the fix commit 97b6ceb against the package 10 findings and the specs of packages 3, 4, 7, 8 and 9. Package 11 fixed code findings 2 to 7 correctly and with tests. Pest passes 196/196 (688 assertions), and Pint and composer validate --strict are green. The code has no blocking findings. The verdict stays blocking for the same reason as before, AC-12: the spec counts any hit of the git grep name search as blocking, and the search still hits (11 lines). All hits are in tracked plan files under docs/plans/laravel-kit-v2/packages/ (10, 11, 12, 15, 16), which hold the name pattern itself. Outside docs/plans the tree has no hits, and the commit messages are clean. A code fix package cannot resolve this, because agents may not edit docs/plans and may not rewrite history.
+
+## Handoff
+
+The code from packages 3, 4, 7, 8, 9 and 11 is ready to build on. Package 11's fixes are verified:
+- DocsGuard counts a tracked file under app/, resources/js/ or resources/views/ as new when a commit since the prompt's transcript timestamp added it (git log --diff-filter=A --since=<epoch>).
+- When the user keeps an edited override (SKIPPED) and an entry exists, install and update keep its recorded boost_sha256. kit:doctor (package 14) should measure drift against that stored value.
+- An invalid manifest gives an error line and FAILURE in kit:install and kit:update. kit:upgrade and kit:doctor should catch Manifest::load's InvalidArgumentException the same way.
+- The quality security rule now names Livewire component validation.
+- The enforce-tests lead-in is a paragraph and has the "run the affected tests" bullet back.
+- The interactive UpdateCommandTest asserts the diff header.
+
+Still open, blocking AC-12: the customer and project name pattern sits in tracked files docs/plans/laravel-kit-v2/packages/10, 11, 12, 15 and 16, and in the branch history of those files. Jarvis or the owner has to fix this, a package agent cannot:
+- Keep the name list out of every tracked file, for example with an untracked pattern file or Jarvis-only context.
+- Remove docs/plans from the branch or strip the list from it.
+- Squash or rewrite the branch history before the first push.
+
+Until then, every later review (package 13 onwards, final review) will hit the same search. Also run the name search with `-- . ':(exclude)docs/plans'` there, so real code hits stay visible.
+
+## Decisions
+
+- Kept the verdict blocking for the AC-12 hits in docs/plans, because the spec says any hit of the name search is blocking; the code itself has no blocking finding.
+- Also searched the tree outside docs/plans, and earlier the history outside docs/plans (git log -p): no hits.
+- Ran Pest with --compact for the reported check, the same suite as the earlier full-output run (196 passed both times).
+- I could not run the shell wrapper stubs/claude/hooks/kit-docs-guard.sh: the Jarvis guard blocks running it. It is unchanged since package 10 and I checked by reading that it exits 0 without vendor/bin/kit-docs-guard.
+- Only Laravel 13 with the installed Boost 2.10.4 runs locally; I reviewed the Laravel 12 and lowest-Boost paths by reading, not by running the matrix.
+
+## Checks
+
+- `PATH="$HOME/Library/Application Support/Herd/bin:$PATH" composer validate --strict`: exit 0, ./composer.json is valid
+- `PATH="$HOME/Library/Application Support/Herd/bin:$PATH" vendor/bin/pest --compact`: exit 0, 196 passed (688 assertions)
+- `PATH="$HOME/Library/Application Support/Herd/bin:$PATH" vendor/bin/pint --test`: exit 0, pint passed
+- `git grep -n -i -E "<name list>"`: exit 0, 11 hits, all in docs/plans/laravel-kit-v2/packages/10, 11, 12, 15, 16 (the search pattern itself); expected no output and exit 1
+- `git log --format=%B | grep -i -E "<name list>"`: exit 0, no output: commit messages clean (the Bash tool records grep's no-match as success; an earlier run with echo showed grep exit 1)
+- `git grep -n -i -E "<name list>" -- . ':(exclude)docs/plans'`: exit 0, no output: no hits outside docs/plans (tool records no-match as success; earlier run showed exit 1)
+
+## Findings
+
+1. [BLOCKING, AC-12 / D-1, data exposure, carried over from package 10 finding 1] The tracked plan specs hold the full list of customer and project names in the AC-12 search command. Files and lines:
+   - docs/plans/laravel-kit-v2/packages/10-review-guidelines-overrides-stack-budget-install-h.md:50-51, 82-83, 87
+   - docs/plans/laravel-kit-v2/packages/11-review-befunde-von-paket-10-beheben.md:13
+   - docs/plans/laravel-kit-v2/packages/12-paket-10-erneut-reviewen.md:50-51
+   - docs/plans/laravel-kit-v2/packages/15-rauchtest-an-frischer-laravel-13-app-install-und-v.md:52-53
+   - docs/plans/laravel-kit-v2/packages/16-schluss-review-gegen-alle-abnahmekriterien.md:52-53
+
+   `git grep -n -i -E "<pattern>"` exits 0 with 11 hits, all in these files. The commits "docs(plan): update laravel-kit-v2" commit them to the branch of the public repo, so a push would publish the names. Outside docs/plans, `git grep` finds nothing, and commit messages are clean.
+
+   Fix (Jarvis or the owner, not a package agent, because docs/plans must not be edited by packages):
+   - Keep the pattern out of every tracked file, for example in an untracked file outside the worktree or in Jarvis-only context.
+   - Remove docs/plans from the branch or strip the list from it.
+   - Rewrite or squash the branch history before the first push.
+
+   Afterwards both `git grep` and `git log -p | grep -i -E "<pattern>"` must exit 1.
+
+Non-blocking findings (no change needed for the verdict):
+2. tests/Feature/Commands/UpdateCommandTest.php:93-94: `expectsOutputToContain('+++ … (kit)')` proves the diff is printed in the interactive run. Laravel's PendingCommand does not enforce order against `expectsConfirmation`, so a regression that prints the diff after the question would still pass. The code prints it first.
+3. src/Hooks/DocsGuard.php:248-254: `git log --since` uses the committer date. When the agent rebases or amends during a turn, files from commits rewritten in the turn count as new, and the guard can block once. This fails safe (one extra block per turn, stop_hook_active lets the agent through) and is acceptable.

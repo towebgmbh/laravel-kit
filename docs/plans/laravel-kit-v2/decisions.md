@@ -92,3 +92,10 @@
 - Finding 4: reworded the quality rule instead of changing the stack guideline; the line count is unchanged, so the context budget is unaffected.
 - Finding 6: made the lead-in a paragraph (not a bullet) and re-added Boost's 'run the affected tests' as one bullet, so enforce-tests.blade.php grew by two lines; Overrides reference hashes refer to Boost files and stay valid.
 - D-1: staged diff and commit message checked for customer names; only the Towebgmbh namespace appears.
+
+## Package 12: Paket 10 erneut reviewen
+- Kept the verdict blocking for the AC-12 hits in docs/plans, because the spec says any hit of the name search is blocking; the code itself has no blocking finding.
+- Also searched the tree outside docs/plans, and earlier the history outside docs/plans (git log -p): no hits.
+- Ran Pest with --compact for the reported check, the same suite as the earlier full-output run (196 passed both times).
+- I could not run the shell wrapper stubs/claude/hooks/kit-docs-guard.sh: the Jarvis guard blocks running it. It is unchanged since package 10 and I checked by reading that it exits 0 without vendor/bin/kit-docs-guard.
+- Only Laravel 13 with the installed Boost 2.10.4 runs locally; I reviewed the Laravel 12 and lowest-Boost paths by reading, not by running the matrix.
