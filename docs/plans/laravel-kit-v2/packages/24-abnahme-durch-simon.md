@@ -2,7 +2,7 @@
 
 # Package 24: Abnahme durch Simon
 
-Kind: acceptance · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: acceptance · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 
@@ -13,7 +13,7 @@ Prepare Simon's acceptance of Laravel Kit v2 and give him a test guide. The pack
 ## Context to read
 
 - The whole concept, especially Acceptance AC-1 to AC-14.
-- Handoffs of packages 13 and 14 (smoke output, name search, review verdict).
+- Handoffs of packages 17 (smoke) and 22 (final re-review: checks and verdict).
 - `README.md`, `scripts/smoke.sh`, `.github/workflows/tests.yml`, `.github/workflows/boost-drift.yml`, `resources/boost/guidelines/core.blade.php`, `resources/boost/skills/kit-spec/FEATURE_TEMPLATE.md`.
 
 Tooling: if `php` or `composer` is not on PATH, `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"`.
@@ -35,8 +35,12 @@ Tooling: if `php` or `composer` is not on PATH, `export PATH="$HOME/Library/Appl
    8. AC-7: `bash scripts/smoke.sh --keep --scenario=upgrade` -> `PASS: upgrade`; open `<work>/upgrade/.ai/kit-upgrade/v1/REPORT.md` (diff of `04-testing.md`), see `.ai/guidelines/project/07-project-rules.md`, and see "This project keeps its Service classes." in `<work>/upgrade/CLAUDE.md`.
    9. AC-10: `KIT_BOOST_DRIFT=1 vendor/bin/pest tests/Drift` -> green locally; `.github/workflows/boost-drift.yml` has the triggers `schedule` and `workflow_dispatch`. On GitHub the workflow can be started by hand only after the merge into the default branch.
    10. AC-11: read `README.md` sections "Installation", "Commands", "Updating", "Upgrading from v1".
-   11. AC-12: the name searches of packages 13 and 14 had no hits.
+   11. AC-12: Jarvis checks the branch for customer names (tree, every commit and the commit messages) right before the push and the pull request, and reports the result to Simon. Name it in the guide as Jarvis's step; Simon does nothing here.
    12. Afterwards: delete the work directories (`rm -rf <work>`). Tag `v2.0.0` and Packagist are Simon's own steps (D-17).
+
+## AC-12 and docs/plans
+
+`docs/plans/` is Jarvis's copy of this plan. Jarvis overwrites it before every package, and it quotes earlier review text; Jarvis replaces any customer names in it, across the whole branch history, before the push. Do not run name searches in this package and do not report anything under `docs/plans/` as a finding. The code outside `docs/plans/` was searched clean by packages 18 to 22. Never write a customer name into a command, the report or the guide.
 
 ## Acceptance criteria
 
@@ -58,4 +62,5 @@ None.
 ## Out of scope
 
 - Code changes of any kind.
+- Anything under `docs/plans/` (Jarvis's plan copy, see above).
 - Tag, release and Packagist registration (D-17).
