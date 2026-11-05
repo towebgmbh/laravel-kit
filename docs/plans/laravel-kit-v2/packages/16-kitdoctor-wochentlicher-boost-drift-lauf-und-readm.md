@@ -2,7 +2,7 @@
 
 # Package 16: kit:doctor, wöchentlicher Boost-Drift-Lauf und README
 
-Kind: implement · Status: pending · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

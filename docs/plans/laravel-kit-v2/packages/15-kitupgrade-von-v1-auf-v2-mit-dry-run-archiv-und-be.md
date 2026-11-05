@@ -2,7 +2,7 @@
 
 # Package 15: kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht
 
-Kind: implement · Status: running · Model: opus · Effort: high · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: opus · Effort: high · Commits: `e9dae16…36ebf56` · Verdict: –
 
 ## Spec
 
@@ -57,3 +57,49 @@ Serves: AC-7, AC-12
 - `kit:doctor` reporting v1 leftovers (package 12).
 - The upgrade scenario in the smoke script (package 13).
 - Changing files under `resources/legacy/v1/`.
+
+## Report
+
+Implemented php artisan kit:upgrade {--dry-run} {--architecture=} {--stack=}. It checks for .claude/.kit-version 1.0.0 and compares the 12 v1 kit files by checksum with resources/legacy/v1/templates (03-frontend.md against the three variants). Unchanged files are deleted. Modified kit files are archived to .ai/kit-upgrade/v1/ with a diff in REPORT.md. Project-own rules move to .ai/guidelines/project/. A copied laravel-claude-kit/ with install.sh is removed, and empty v1 folders are cleaned up. The command derives stack and architecture, then runs kit:install --existing in the same process. docs/ and foreign skills are never touched. New tests: UpgradeCommandTest, V1InventoryTest, ArchitectureResolverTest, with a V1ProjectFixture. Full suite: 256 passed. Pint is clean. Two commits.
+
+## Handoff
+
+New code:
+- src/Upgrade/V1Inventory.php: the v1 file set, hash() = Manifest::hash(rtrim(contents)), isUnchanged(), original(path, ?contents), exactFrontendVariant(), frontendVariant(), constants VERSION_FILE, VERSION, FRONTEND_RULE, SKILLS, FRONTEND_VARIANTS.
+- src/Upgrade/UpgradePlan.php: build(basePath), actions(), ofType(), execute(), constants ARCHIVE_DIR, REPORT, PROJECT_GUIDELINES, RULES_DIR, KIT_COPY.
+- src/Upgrade/UpgradeAction.php: readonly type/path/target/reason.
+- src/Upgrade/ArchitectureResolver.php: resolve(basePath), deviations(contents).
+- src/Console/UpgradeCommand.php, registered in KitServiceProvider.
+- tests/Support/V1ProjectFixture.php: create(?string $deviation). Pass null for the unchanged v1 GUIDELINES template. It has public constants for the fixture texts.
+
+For package 16 (kit:doctor), v1 leftovers can reuse V1Inventory::VERSION_FILE, V1Inventory::paths() and UpgradePlan::RULES_DIR. For package 17 (smoke upgrade scenario): `kit:upgrade --no-interaction` works on a fresh app. The v1 fixture logic in V1ProjectFixture shows what to copy from resources/legacy/v1/templates. The stack comes from an exact 03-frontend.md match, so a livewire variant gives `livewire` even without livewire in composer.json.
+
+Watch:
+- Interactive runs ask "Apply this plan?" before changing anything.
+- The report is built before the files move.
+- A failed kit:install after the cleanup returns FAILURE with a hint to rerun kit:install.
+- REPORT.md quotes v1 contradiction sentences inside diff blocks. That is harmless because Boost only loads .ai/guidelines/, not .ai/kit-upgrade/.
+- Moved project rules are loaded by Boost as user guidelines, including their frontmatter text.
+
+D-1: I reviewed the diff and both commit messages before committing. The fixture content is generic (orders, invoices, billing). No client or project names.
+
+## Decisions
+
+- original() takes (string $projectPath, ?string $contents = null): projectPath is the relative project path; contents is needed to pick the closest 03-frontend variant.
+- Added exactFrontendVariant() and isUnchanged()/hashes()/has()/paths() to V1Inventory besides the specified methods.
+- Stack order: --stack, exact 03-frontend.md variant, StackDetector, closest variant, interactive select (else error 'Pass --stack'). Detector before closest variant: v1 had no inertia-react variant.
+- Separate UpgradeAction readonly value class (src/Upgrade/UpgradeAction.php) for plan entries.
+- Archive target already exists -> keep (not overwrite), like the move rule; laravel-claude-kit symlinks are ignored, symlinked rule files are not moved.
+- Only top-level regular *.md files in .claude/rules count as project rules; other files and subfolders there stay untouched.
+- Interactive (non-dry-run) upgrade asks 'Apply this plan?' (default yes) after printing the plan; --no-interaction applies directly.
+- kit:upgrade also fails before changing anything when boost.json is invalid or the manifest is invalid JSON (same messages as kit:install), including on --dry-run.
+- A .kit-version other than 1.0.0 gives the same 'No v1 kit found' error.
+- REPORT.md fences diffs with a fence longer than any backtick run in the diff (v1 files contain code fences); diff headers '(kit v1)' and '(project)'; CRLF normalised before diffing.
+- The report records the source of the stack too, not only the architecture.
+- Fixture: the services deviation line is inserted after the Deviations blockquote (the template's comment block stays); review SKILL.md changes the '# Code Review' heading; laravel-claude-kit also holds a README.md.
+- Extra tests beyond spec: other kit version, options override, unknown architecture, project rule target exists, kit copy without install.sh, invalid manifest.
+
+## Checks
+
+- `vendor/bin/pest --compact --colors=never`: exit 0, 256 passed (891 assertions)
+- `vendor/bin/pint --test`: exit 0, passed

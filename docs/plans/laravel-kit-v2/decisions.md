@@ -116,3 +116,18 @@
 - The searches without matches are reported with exit 0 as the Bash tool recorded them (it treats grep's no-match as success); they printed nothing or a count of 0.
 - Only Laravel 13 / Boost 2.10.4 run locally; the Laravel 12 and lowest-Boost matrix was not run.
 - Did not run the shell wrapper stub: the Jarvis guard blocks unwritten scripts; it is unchanged since package 10.
+
+## Package 15: kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht
+- original() takes (string $projectPath, ?string $contents = null): projectPath is the relative project path; contents is needed to pick the closest 03-frontend variant.
+- Added exactFrontendVariant() and isUnchanged()/hashes()/has()/paths() to V1Inventory besides the specified methods.
+- Stack order: --stack, exact 03-frontend.md variant, StackDetector, closest variant, interactive select (else error 'Pass --stack'). Detector before closest variant: v1 had no inertia-react variant.
+- Separate UpgradeAction readonly value class (src/Upgrade/UpgradeAction.php) for plan entries.
+- Archive target already exists -> keep (not overwrite), like the move rule; laravel-claude-kit symlinks are ignored, symlinked rule files are not moved.
+- Only top-level regular *.md files in .claude/rules count as project rules; other files and subfolders there stay untouched.
+- Interactive (non-dry-run) upgrade asks 'Apply this plan?' (default yes) after printing the plan; --no-interaction applies directly.
+- kit:upgrade also fails before changing anything when boost.json is invalid or the manifest is invalid JSON (same messages as kit:install), including on --dry-run.
+- A .kit-version other than 1.0.0 gives the same 'No v1 kit found' error.
+- REPORT.md fences diffs with a fence longer than any backtick run in the diff (v1 files contain code fences); diff headers '(kit v1)' and '(project)'; CRLF normalised before diffing.
+- The report records the source of the stack too, not only the architecture.
+- Fixture: the services deviation line is inserted after the Deviations blockquote (the template's comment block stays); review SKILL.md changes the '# Code Review' heading; laravel-claude-kit also holds a README.md.
+- Extra tests beyond spec: other kit version, options override, unknown architecture, project rule target exists, kit copy without install.sh, invalid manifest.
