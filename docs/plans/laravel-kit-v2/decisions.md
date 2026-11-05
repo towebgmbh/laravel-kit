@@ -84,3 +84,11 @@
 - Only Laravel 13.40.0 / Boost 2.10.4 are installed locally; the Laravel 12 and lowest-Boost branches were reviewed by reading, not by running the matrix.
 - Ran Pest with --compact for the reported check (same suite, same result as the earlier full-output run).
 - The commit message search reports exit 0 as the Bash tool recorded it: the tool treats a grep without matches as success; the command printed nothing, so there were no matches (an earlier run with an explicit exit echo showed grep's own exit 1).
+
+## Package 11: Review-Befunde von Paket 10 beheben
+- Finding 1 (AC-12, name list in tracked docs/plans files) not addressed: package agents may not edit docs/plans or rewrite branch history; needs Jarvis or the owner before the first push.
+- Finding 3: keep the previous override entry only when the write was skipped and an entry already exists; a first install with a differing file still records the entry (package 7 decision stays).
+- Finding 2: implemented via a second injectable closure and the prompt's transcript timestamp (git log --diff-filter=A --since=<epoch>); applies to any tool, not only Write, and is skipped when the transcript has no timestamp.
+- Finding 4: reworded the quality rule instead of changing the stack guideline; the line count is unchanged, so the context budget is unaffected.
+- Finding 6: made the lead-in a paragraph (not a bullet) and re-added Boost's 'run the affected tests' as one bullet, so enforce-tests.blade.php grew by two lines; Overrides reference hashes refer to Boost files and stay valid.
+- D-1: staged diff and commit message checked for customer names; only the Towebgmbh namespace appears.

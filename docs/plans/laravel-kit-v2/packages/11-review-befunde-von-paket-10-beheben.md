@@ -2,7 +2,7 @@
 
 # Package 11: Review-Befunde von Paket 10 beheben
 
-Kind: fix · Status: running · Model: default · Effort: default · Commits: – · Verdict: –
+Kind: fix · Status: done · Model: default · Effort: default · Commits: `fd15284…97b6ceb` · Verdict: –
 
 ## Spec
 
@@ -19,3 +19,26 @@ Non-blocking findings (no change needed for the verdict):
 5. src/Console/InstallCommand.php:81 and src/Console/UpdateCommand.php:37: Manifest::load throws InvalidArgumentException on an invalid .ai/kit-manifest.json. The commands do not catch it, so the user sees an exception trace instead of an error line and FAILURE.
 6. stubs/ai/guidelines/enforce-tests.blade.php:3: "- Follow the Laravel Kit test line:" is a bullet followed by sibling bullets; the rules read better as a heading or nested list. Boost's "run the affected tests and ensure they pass" was dropped. Quality's DoD and Boost's phpunit/pest core cover it, so this is only cosmetic.
 7. tests/Feature/Commands/UpdateCommandTest.php:89-99: the interactive test does not assert that the diff is printed before the confirmation (AC-5 "shows the diff and asks"). The code does print it first (UpdateCommand.php:157), but nothing would catch a regression.
+
+## Report
+
+Findings 2 to 7 of the package 10 review are fixed in one commit (97b6ceb); the suite is green (196 tests), Pint and composer validate are clean. Finding 1 (AC-12, customer names in the tracked plan files) is not addressed: it needs a decision by Jarvis or the owner, because package agents may not edit docs/plans or rewrite history.
+
+## Handoff
+
+Changed: (2) src/Hooks/DocsGuard.php: new optional constructor arg $addedSince(cwd, path, since): bool (default: git log --diff-filter=A --since=<epoch>); a tracked file under app/, resources/js/ or resources/views/ also counts as new when a commit since the last prompt's transcript timestamp added it; without a timestamp the old behaviour stays. (3) InstallCommand and UpdateCommand keep the previous override entry in the manifest (boost_sha256) when the write was SKIPPED and an entry exists; a first install with a differing file still records it. Package 14 (kit:doctor) can rely on that: drift is measured against the Boost text the local override was written for. (4) quality.blade.php Security rule now reads "Validate every input (Form Requests for controllers, component validation in Livewire) and authorise ...", the three KitGuidelines snapshots were updated. (5) Both commands catch InvalidArgumentException from Manifest::load, print the message plus a hint and return FAILURE (install fails before writing anything). kit:upgrade and kit:doctor should do the same. (6) enforce-tests stub: the lead-in is a plain paragraph line followed by bullets, and "When tests apply, run the affected tests and ensure they pass." was added; the marker 'Follow the Laravel Kit test line:' is unchanged. (7) UpdateCommandTest asserts the '+++ path (kit)' diff output in the interactive test. New tests: invalid manifest (install, update), kept override hash (install, update), commit-in-turn in DocsGuardTest. Local PHP: Herd's php is not on PATH in the Bash tool; use PATH="$HOME/Library/Application Support/Herd/bin:$PATH" (PHP 8.5.12 locally). NOT addressed: finding 1 (AC-12). The name pattern is still in docs/plans/laravel-kit-v2/packages/10, 13 and 14 (and package 11's spec may copy it), so `git grep` with the pattern still hits and the names are in branch history. Before the first push Jarvis or the owner must remove the list from the plan files (or docs/plans from the branch) and rewrite or squash the history so no commit holds the names; package 12 and the final review will hit the same issue until then, and their name search should run against a tree and history without docs/plans.
+
+## Decisions
+
+- Finding 1 (AC-12, name list in tracked docs/plans files) not addressed: package agents may not edit docs/plans or rewrite branch history; needs Jarvis or the owner before the first push.
+- Finding 3: keep the previous override entry only when the write was skipped and an entry already exists; a first install with a differing file still records the entry (package 7 decision stays).
+- Finding 2: implemented via a second injectable closure and the prompt's transcript timestamp (git log --diff-filter=A --since=<epoch>); applies to any tool, not only Write, and is skipped when the transcript has no timestamp.
+- Finding 4: reworded the quality rule instead of changing the stack guideline; the line count is unchanged, so the context budget is unaffected.
+- Finding 6: made the lead-in a paragraph (not a bullet) and re-added Boost's 'run the affected tests' as one bullet, so enforce-tests.blade.php grew by two lines; Overrides reference hashes refer to Boost files and stay valid.
+- D-1: staged diff and commit message checked for customer names; only the Towebgmbh namespace appears.
+
+## Checks
+
+- `vendor/bin/pest --compact`: exit 0, 196 passed (688 assertions)
+- `vendor/bin/pint --test`: exit 0, passed
+- `composer validate --strict`: exit 0, composer.json is valid
