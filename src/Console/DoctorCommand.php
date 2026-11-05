@@ -118,17 +118,21 @@ class DoctorCommand extends Command
     protected function checkLeftovers(string $basePath): void
     {
         $found = [];
+        $inventory = new V1Inventory;
+        $hasVersionFile = is_file($basePath.'/'.V1Inventory::VERSION_FILE);
 
         foreach (glob($basePath.'/'.UpgradePlan::RULES_DIR.'/*.md') ?: [] as $file) {
             $found[] = UpgradePlan::RULES_DIR.'/'.basename($file);
         }
 
-        foreach ((new V1Inventory)->paths() as $path) {
-            if (str_starts_with($path, UpgradePlan::RULES_DIR.'/')) {
+        // Skills and the template have generic names; without the v1 version file
+        // they only count when they are still an unchanged v1 original.
+        foreach ($inventory->paths() as $path) {
+            if (str_starts_with($path, UpgradePlan::RULES_DIR.'/') || ! is_file($basePath.'/'.$path)) {
                 continue;
             }
 
-            if (is_file($basePath.'/'.$path)) {
+            if ($hasVersionFile || $inventory->isUnchanged($path, (string) file_get_contents($basePath.'/'.$path))) {
                 $found[] = $path;
             }
         }
@@ -137,12 +141,16 @@ class DoctorCommand extends Command
             $found[] = UpgradePlan::KIT_COPY.'/install.sh';
         }
 
-        if (is_file($basePath.'/'.V1Inventory::VERSION_FILE)) {
+        if ($hasVersionFile) {
             $found[] = V1Inventory::VERSION_FILE;
         }
 
         if ($found !== []) {
-            $this->warnLine('Leftover v1 files: '.implode(', ', $found).'. Run php artisan kit:upgrade.');
+            // kit:upgrade needs the version file, so name the manual fix without it.
+            $fix = $hasVersionFile
+                ? 'Run php artisan kit:upgrade.'
+                : 'Remove them, or restore '.V1Inventory::VERSION_FILE.' and run php artisan kit:upgrade.';
+            $this->warnLine('Leftover v1 files: '.implode(', ', $found).'. '.$fix);
 
             return;
         }

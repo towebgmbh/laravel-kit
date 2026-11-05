@@ -4,6 +4,7 @@ use Tests\Support\BoostFixture;
 use Towebgmbh\LaravelKit\Kit;
 use Towebgmbh\LaravelKit\Manifest;
 use Towebgmbh\LaravelKit\Overrides;
+use Towebgmbh\LaravelKit\Upgrade\V1Inventory;
 
 function kitDoctorFixture(bool $pest = true): BoostFixture
 {
@@ -70,21 +71,51 @@ it('reports a changed override hash as drift', function () {
 
 it('warns about v1 leftovers', function () {
     $this->fixture = kitDoctorFixture();
+    $this->fixture->put('.claude/.kit-version', '1.0.0');
     $this->fixture->put('.claude/rules/01-architecture.md', '# rule');
 
     $this->artisan('kit:doctor')
-        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/rules/01-architecture.md. Run php artisan kit:upgrade.')
+        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/rules/01-architecture.md, .claude/.kit-version. Run php artisan kit:upgrade.')
         ->assertSuccessful();
 });
 
-it('warns about v1 skills, template and kit copy without a version file', function () {
+it('names the manual fix when the version file is missing', function () {
     $this->fixture = kitDoctorFixture();
-    $this->fixture->put('.claude/skills/review/SKILL.md', '# review');
-    $this->fixture->put('.claude/templates/FEATURE_TEMPLATE.md', '# template');
+    $this->fixture->put('.claude/rules/01-architecture.md', '# rule');
+
+    $this->artisan('kit:doctor')
+        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/rules/01-architecture.md. Remove them, or restore .claude/.kit-version and run php artisan kit:upgrade.')
+        ->assertSuccessful();
+});
+
+it('warns about unchanged v1 skills, template and kit copy without a version file', function () {
+    $this->fixture = kitDoctorFixture();
+    $inventory = new V1Inventory;
+    $this->fixture->put('.claude/skills/review/SKILL.md', $inventory->original('.claude/skills/review/SKILL.md'));
+    $this->fixture->put('.claude/templates/FEATURE_TEMPLATE.md', $inventory->original('.claude/templates/FEATURE_TEMPLATE.md'));
     $this->fixture->put('laravel-claude-kit/install.sh', '#!/bin/sh');
 
     $this->artisan('kit:doctor')
-        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/skills/review/SKILL.md, .claude/templates/FEATURE_TEMPLATE.md, laravel-claude-kit/install.sh. Run php artisan kit:upgrade.')
+        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/skills/review/SKILL.md, .claude/templates/FEATURE_TEMPLATE.md, laravel-claude-kit/install.sh. Remove them, or restore .claude/.kit-version and run php artisan kit:upgrade.')
+        ->assertSuccessful();
+});
+
+it('ignores a project skill with a v1 name without a version file', function () {
+    $this->fixture = kitDoctorFixture();
+    $this->fixture->put('.claude/skills/review/SKILL.md', "---\nname: review\n---\nOur own review skill.");
+
+    $this->artisan('kit:doctor')
+        ->expectsOutputToContain('[OK] No v1 leftovers')
+        ->assertSuccessful();
+});
+
+it('counts a changed v1 skill as a leftover when the version file exists', function () {
+    $this->fixture = kitDoctorFixture();
+    $this->fixture->put('.claude/.kit-version', '1.0.0');
+    $this->fixture->put('.claude/skills/review/SKILL.md', '# adapted review');
+
+    $this->artisan('kit:doctor')
+        ->expectsOutputToContain('[WARN] Leftover v1 files: .claude/skills/review/SKILL.md, .claude/.kit-version. Run php artisan kit:upgrade.')
         ->assertSuccessful();
 });
 
