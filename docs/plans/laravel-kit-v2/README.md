@@ -168,8 +168,8 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 2 | implement | Testbench-Harness mit Boost-Fixture und niedrigste Boost-Version | done | opus | `5ddd70c…9964038` | – |
 | 3 | implement | Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides | done | opus | `7449fd6…585493f` | – |
 | 4 | implement | Stack-Varianten mit @scoped, Stack-Erkennung und Kontextbudget-Test | done | sonnet | `6024dda…c36e79d` | – |
-| 5 | implement | Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief | running | sonnet | – | – |
-| 6 | implement | Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle | pending | opus | – | – |
+| 5 | implement | Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief | done | sonnet | `abef363…2490900` | – |
+| 6 | implement | Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle | running | opus | – | – |
 | 7 | implement | kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku | pending | opus | – | – |
 | 8 | implement | Claude-Stop-Hooks: Pint einmal pro Turn und struktureller Doku-Wächter | pending | opus | – | – |
 | 9 | implement | kit:update mit Diff und Rückfrage | pending | sonnet | – | – |

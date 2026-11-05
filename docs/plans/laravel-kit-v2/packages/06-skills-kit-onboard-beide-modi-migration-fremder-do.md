@@ -2,7 +2,7 @@
 
 # Package 6: Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle
 
-Kind: implement · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

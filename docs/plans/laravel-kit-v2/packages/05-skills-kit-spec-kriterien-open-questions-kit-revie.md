@@ -2,7 +2,7 @@
 
 # Package 5: Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief
 
-Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: sonnet · Effort: medium · Commits: `abef363…2490900` · Verdict: –
 
 ## Spec
 
@@ -53,3 +53,22 @@ Serves: AC-9, AC-12, AC-14
 
 - `kit-onboard`, `kit-docs-split`, flat doc stubs and new-project stubs (package 6).
 - Commands (packages 7 to 12).
+
+## Report
+
+Added the skills kit-spec (with FEATURE_TEMPLATE.md), kit-review and kit-brief under resources/boost/skills, plus SkillDiscoveryTest and SkillContentTest. Boost discovers all three without parse failures. Pest (100 tests) and Pint pass. Commit 2490900.
+
+## Handoff
+
+Files: resources/boost/skills/kit-spec/{SKILL.md,FEATURE_TEMPLATE.md}, kit-review/SKILL.md, kit-brief/SKILL.md; tests/Feature/Skills/{SkillDiscoveryTest,SkillContentTest}.php. SkillDiscoveryTest holds KIT_SKILLS_SO_FAR (kit-brief, kit-review, kit-spec); package 6 must extend it with kit-onboard and kit-docs-split. The SkillParseFailures class is an instance (app(SkillParseFailures::class)->all()), not static. SkillContentTest scans every file under resources/boost/skills for Contradictions::SENTENCES and 'full suite after each phase', so package 6 files are covered automatically. The template uses 'Acceptance Criteria' with AC-n and 'Open Questions' with the blocking/non-blocking marker. kit-spec references docs/_templates/ in split layout and kit-brief calls `php artisan kit:doctor` (command lands in package 12). No allowed-tools in frontmatter. D-1 checked: diff and commit message contain only generic examples.
+
+## Decisions
+
+- Template is a plain Markdown file (not code-fenced like v1) with a 'Status: 🔲 Planned' line; the status legend sits in kit-spec SKILL.md.
+- kit-review and kit-brief are read-only and tell the agent not to run the complete test suite.
+- argument-hint kept in kit-spec, kit-review and kit-brief; no allowed-tools.
+
+## Checks
+
+- `vendor/bin/pest`: exit 0, 100 passed
+- `vendor/bin/pint --test`: exit 0, passed

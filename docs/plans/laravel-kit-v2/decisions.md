@@ -30,3 +30,8 @@
 - StackDetector api rule: laravel/sanctum present and no .blade.php other than welcome.blade.php anywhere under resources/views (recursive).
 - Updated the three existing KitGuidelinesTest snapshots, since the stack section is now part of the kit text.
 - Budget test uses Kit::STACKS and Kit::ARCHITECTURES as datasets.
+
+## Package 5: Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief
+- Template is a plain Markdown file (not code-fenced like v1) with a 'Status: 🔲 Planned' line; the status legend sits in kit-spec SKILL.md.
+- kit-review and kit-brief are read-only and tell the agent not to run the complete test suite.
+- argument-hint kept in kit-spec, kit-review and kit-brief; no allowed-tools.
