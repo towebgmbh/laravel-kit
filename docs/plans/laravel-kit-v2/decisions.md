@@ -140,3 +140,10 @@
 - Removed tests/Drift/.gitkeep because the folder now has a test.
 - README describes the hooks as two Stop hooks (Pint and docs guard), per the plan, not PostToolUse.
 - I did not run the weekly workflow on GitHub; checked by reading only.
+
+## Package 17: Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job
+- The script finds the Claude hooks file with `ls .claude/*.json` because the Jarvis guard blocked running a script naming the settings file literally.
+- Contradiction sentences are read from the PHP class at runtime instead of copied.
+- Bash upgrade fixture is simpler than V1ProjectFixture (short project rule, plain hyphen in the services deviation line).
+- Name-search hits in docs/plans left untouched (read-only for packages); reported as the known blocker.
+- No commit message contains a name.

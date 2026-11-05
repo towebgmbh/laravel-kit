@@ -180,8 +180,8 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 14 | review | Paket 10 erneut reviewen | done | opus | none | blocking |
 | 15 | implement | kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht | done | opus | `e9dae16…36ebf56` | – |
 | 16 | implement | kit:doctor, wöchentlicher Boost-Drift-Lauf und README | done | sonnet | `3a4aef6…3400c51` | – |
-| 17 | implement | Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job | running | sonnet | – | – |
-| 18 | review | Schluss-Review gegen alle Abnahmekriterien | pending | opus | – | – |
+| 17 | implement | Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job | done | sonnet | `3056fc0…ab589b2` | – |
+| 18 | review | Schluss-Review gegen alle Abnahmekriterien | running | opus | – | – |
 | 19 | acceptance | Abnahme durch Simon | pending | opus | – | – |
 
 Each package's spec, report, handoff, decisions, checks and findings are in `packages/`; every reported decision is in `decisions.md`.

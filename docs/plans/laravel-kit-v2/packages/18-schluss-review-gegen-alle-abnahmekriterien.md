@@ -2,7 +2,7 @@
 
 # Package 18: Schluss-Review gegen alle Abnahmekriterien
 
-Kind: review · Status: pending · Model: opus · Effort: high · Commits: – · Verdict: –
+Kind: review · Status: running · Model: opus · Effort: high · Commits: – · Verdict: –
 
 ## Spec
 
