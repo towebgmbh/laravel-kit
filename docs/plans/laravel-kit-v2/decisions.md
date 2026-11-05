@@ -76,3 +76,11 @@
 - kit:update also errors when boost.json is invalid, same as install.
 - The diff is printed whenever a changed file is encountered, including non-interactive runs, followed by the 'Skipped [path]: local changes kept.' warning.
 - Deleted pest/core is also dropped from manifest files, not just overrides.
+
+## Package 10: Review: Guidelines, Overrides, Stack, Budget, Install, Hooks und Update
+- Treated the git grep hits inside docs/plans (excluded from the reviewed diff) as blocking, because the spec says any hit of the AC-12 search is blocking and the files are tracked in the public repo's branch history.
+- Graded the DocsGuard commit-in-turn gap as non-blocking: the behaviour follows D-19 (new = untracked via git ls-files) as specified.
+- Did not run the shell wrapper by hand; its exit-0 path without vendor was verified by reading the script, and the binary is covered by DocsGuardTest.
+- Only Laravel 13.40.0 / Boost 2.10.4 are installed locally; the Laravel 12 and lowest-Boost branches were reviewed by reading, not by running the matrix.
+- Ran Pest with --compact for the reported check (same suite, same result as the earlier full-output run).
+- The commit message search reports exit 0 as the Bash tool recorded it: the tool treats a grep without matches as success; the command printed nothing, so there were no matches (an earlier run with an explicit exit echo showed grep's own exit 1).

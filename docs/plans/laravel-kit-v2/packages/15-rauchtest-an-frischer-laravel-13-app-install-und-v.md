@@ -1,6 +1,6 @@
 <!-- Jarvis maintains this file and overwrites it before every work package. Change the plan on the initiative page in Jarvis. -->
 
-# Package 13: Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job
+# Package 15: Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job
 
 Kind: implement · Status: pending · Model: sonnet · Effort: medium · Commits: – · Verdict: –
 

@@ -1,6 +1,6 @@
 <!-- Jarvis maintains this file and overwrites it before every work package. Change the plan on the initiative page in Jarvis. -->
 
-# Package 15: Abnahme durch Simon
+# Package 17: Abnahme durch Simon
 
 Kind: acceptance · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
 

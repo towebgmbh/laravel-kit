@@ -173,11 +173,13 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 7 | implement | kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku | done | opus | `93da9af…4cb268d` | – |
 | 8 | implement | Claude-Stop-Hooks: Pint einmal pro Turn und struktureller Doku-Wächter | done | opus | `18acd27…0d36eb8` | – |
 | 9 | implement | kit:update mit Diff und Rückfrage | done | sonnet | `64f1078…00627ed` | – |
-| 10 | review | Review: Guidelines, Overrides, Stack, Budget, Install, Hooks und Update | running | opus | – | – |
-| 11 | implement | kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht | pending | opus | – | – |
-| 12 | implement | kit:doctor, wöchentlicher Boost-Drift-Lauf und README | pending | sonnet | – | – |
-| 13 | implement | Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job | pending | sonnet | – | – |
-| 14 | review | Schluss-Review gegen alle Abnahmekriterien | pending | opus | – | – |
-| 15 | acceptance | Abnahme durch Simon | pending | opus | – | – |
+| 10 | review | Review: Guidelines, Overrides, Stack, Budget, Install, Hooks und Update | done | opus | none | blocking |
+| 11 | fix | Review-Befunde von Paket 10 beheben | running | default | – | – |
+| 12 | review | Paket 10 erneut reviewen | pending | opus | – | – |
+| 13 | implement | kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht | pending | opus | – | – |
+| 14 | implement | kit:doctor, wöchentlicher Boost-Drift-Lauf und README | pending | sonnet | – | – |
+| 15 | implement | Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job | pending | sonnet | – | – |
+| 16 | review | Schluss-Review gegen alle Abnahmekriterien | pending | opus | – | – |
+| 17 | acceptance | Abnahme durch Simon | pending | opus | – | – |
 
 Each package's spec, report, handoff, decisions, checks and findings are in `packages/`; every reported decision is in `decisions.md`.
