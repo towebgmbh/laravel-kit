@@ -173,3 +173,10 @@
 - Rated the two new kit:doctor findings non-blocking: warnings only, exit 0 per D-27.
 - Only Laravel 13 / Boost 2.10.4 ran locally; the Laravel 12 and Boost 2.10.0 matrix cells and the GitHub workflows were not run.
 - Did not run the shell wrapper stub by hand; it is unchanged since package 10 and the smoke test installs it.
+
+## Package 21: Review-Befunde von Paket 18 beheben
+- Finding 1 (AC-12, name list in tracked docs/plans files) not addressed: docs/plans is read-only for packages and the fix needs a history rewrite by Jarvis or the owner.
+- Finding 3: chose 'unchanged v1 original, or version file present' over 'only unchanged'; with the version file the project is a v1 project and kit:upgrade archives changed skills, so they stay leftovers. A customised v1 skill without the version file is not reported.
+- Finding 2: the hint depends only on whether .claude/.kit-version exists; it also applies to rule-file leftovers, whose old test message changed accordingly.
+- Did not run the smoke script; it needs network and the changed check is not part of it.
+- D-1: checked the diff and commit message for customer names; none, fixtures are generic.
