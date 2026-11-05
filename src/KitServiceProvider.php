@@ -4,6 +4,7 @@ namespace Towebgmbh\LaravelKit;
 
 use Illuminate\Support\ServiceProvider;
 use Towebgmbh\LaravelKit\Console\InstallCommand;
+use Towebgmbh\LaravelKit\Console\UpdateCommand;
 
 class KitServiceProvider extends ServiceProvider
 {
@@ -29,6 +30,7 @@ class KitServiceProvider extends ServiceProvider
 
         $this->commands([
             InstallCommand::class,
+            UpdateCommand::class,
         ]);
     }
 }

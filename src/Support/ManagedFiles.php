@@ -30,6 +30,7 @@ final class ManagedFiles
         private readonly Manifest $manifest,
         private readonly bool $force,
         private readonly Closure $confirm,
+        private readonly bool $replaceUnmodified = false,
     ) {}
 
     public function manifest(): Manifest
@@ -46,7 +47,7 @@ final class ManagedFiles
             $result = self::CREATED;
         } elseif (Manifest::hash((string) file_get_contents($file)) === Manifest::hash($contents)) {
             $result = self::UNCHANGED;
-        } elseif ($this->force || ($this->confirm)($relativePath)) {
+        } elseif ($this->force || $this->isUnmodified($relativePath, $file) || ($this->confirm)($relativePath)) {
             $this->put($file, $contents);
             $result = self::REPLACED;
         } else {
@@ -58,6 +59,28 @@ final class ManagedFiles
         }
 
         return $result;
+    }
+
+    /** Deletes a file whose contents still match the manifest; returns false when it was kept. */
+    public function deleteIfUnmodified(string $relativePath): bool
+    {
+        $file = $this->absolute($relativePath);
+
+        if (is_file($file)) {
+            if ($this->manifest->fileHash($relativePath) !== Manifest::hash((string) file_get_contents($file))) {
+                return false;
+            }
+
+            unlink($file);
+        }
+
+        return true;
+    }
+
+    private function isUnmodified(string $relativePath, string $file): bool
+    {
+        return $this->replaceUnmodified
+            && $this->manifest->fileHash($relativePath) === Manifest::hash((string) file_get_contents($file));
     }
 
     public function writeOnce(string $relativePath, string $contents): string
