@@ -2,7 +2,7 @@
 
 # Package 4: Stack-Varianten mit @scoped, Stack-Erkennung und Kontextbudget-Test
 
-Kind: implement · Status: pending · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

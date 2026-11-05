@@ -14,3 +14,12 @@
 - BoostFixture::create accepts package lists as names or name => version; versions default to the installed version via Composer\InstalledVersions.
 - The pre-set enforce_tests=false case is a PHPUnit class test (ServiceProviderOwnEnforceTestsTest) with defineEnvironment; it also re-registers KitServiceProvider with force to prove the provider keeps false.
 - Added BoostDiscoveryTest cases checking that the 'tests' (enforce-tests) guideline renders only with enforceTests true, and that boost:update is registered.
+
+## Package 3: Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides
+- Overrides::BOOST_VERSION = '2.10.4' (installed latest); hashes: enforce-tests da3c2b35..., pest/core f4366933... (Manifest::hash).
+- Marker sentence for actions mode is 'Business logic lives in Actions.' followed by the Action location sentence; migrating mode repeats the Action naming/handle() rule briefly.
+- DTO, Policy, enum and model rules render in all three modes; only the business-logic location differs per mode.
+- Added BoostFixture::withOverrides() as the test helper for copying stubs (spec task 9).
+- Added a split_threshold config test and a test that overrides render exactly once (not duplicated as user guidelines).
+- Overrides::stub() throws InvalidArgumentException for unknown paths; installedBoostIsOlderThanReference() returns false when the installed version is not numeric (e.g. dev-main).
+- core points to the test line with 'Follow the test line in the Test Enforcement rules.' instead of repeating it.

@@ -2,7 +2,7 @@
 
 # Package 3: Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides
 
-Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: opus · Effort: medium · Commits: `7449fd6…585493f` · Verdict: –
 
 ## Spec
 
@@ -68,3 +68,27 @@ Serves: AC-1, AC-2, AC-12, AC-13, AC-14
 - `stack.blade.php`, `StackDetector` and `ContextBudgetTest` (package 4).
 - Writing overrides into projects, the Pest condition at install time and the manifest entries (package 7).
 - The weekly drift test and workflow (package 12).
+
+## Report
+
+Wrote the kit guidelines core (size rule, SDD phases, docs in flat/split layout, record-rule fallback), architecture (three modes, model rules per Laravel version), conventions and quality, plus the override stubs enforce-tests (test line) and pest/core (Running Tests rewritten). Added src/Overrides.php (BOOST_VERSION 2.10.4, reference hashes) and tests/Support/Contradictions.php. KitGuidelinesTest and OverridesTest prove through GuidelineComposer: keys, mode markers, layout markers, overrides replace Boost texts, no contradictions, 80 rendered lines (limit 150), snapshots per mode. Full suite 44 passed, Pint clean.
+
+## Handoff
+
+Files: resources/boost/guidelines/{core,architecture,conventions,quality}.blade.php; stubs/ai/guidelines/enforce-tests.blade.php and stubs/ai/guidelines/pest/core.blade.php; src/Overrides.php (all(), stub(), installedBoostHash(), installedBoostVersion(), installedBoostIsReference(), installedBoostIsOlderThanReference()); tests/Support/Contradictions.php; BoostFixture::withOverrides() copies all override stubs into the fixture (both, Pest-independent; package 7 must apply the D-37 Pest condition itself); tests/Feature/Guidelines/{KitGuidelinesTest,OverridesTest}.php; snapshots in tests/.pest/snapshots/Feature/Guidelines/KitGuidelinesTest/ (Laravel 13 only; update them with --update-snapshots when guideline text changes). Budget: the four guidelines render to 80 lines, so package 4's stack guideline has about 120 lines left of the 200. Rendered order is alphabetical by key (architecture, conventions, core, quality). Boost's Pest guideline key is 'pest/core', the test guideline key is 'tests'. Avoid '@can', '@include', '@props', '<x-' in guideline text (Boost placeholders). Watch: the Bash guard hook rejects heredocs containing the word sequence "at most once at" (treated as the `at` command); write such files with the Write tool. Laravel 12 branch (fillable) not run locally, CI covers it. D-1: diff and commit messages checked, only generic examples (Billing, Catalog, Invoice).
+
+## Decisions
+
+- Overrides::BOOST_VERSION = '2.10.4' (installed latest); hashes: enforce-tests da3c2b35..., pest/core f4366933... (Manifest::hash).
+- Marker sentence for actions mode is 'Business logic lives in Actions.' followed by the Action location sentence; migrating mode repeats the Action naming/handle() rule briefly.
+- DTO, Policy, enum and model rules render in all three modes; only the business-logic location differs per mode.
+- Added BoostFixture::withOverrides() as the test helper for copying stubs (spec task 9).
+- Added a split_threshold config test and a test that overrides render exactly once (not duplicated as user guidelines).
+- Overrides::stub() throws InvalidArgumentException for unknown paths; installedBoostIsOlderThanReference() returns false when the installed version is not numeric (e.g. dev-main).
+- core points to the test line with 'Follow the test line in the Test Enforcement rules.' instead of repeating it.
+
+## Checks
+
+- `vendor/bin/pest tests/Feature/Guidelines 2>&1 | tail -40`: exit 0, 24 passed, 3 incomplete (snapshots created on first run)
+- `vendor/bin/pest 2>&1 | tail -4`: exit 0, 44 passed (147 assertions)
+- `vendor/bin/pint --test 2>&1 | tail -3`: exit 0, passed
