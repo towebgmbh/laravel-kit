@@ -106,3 +106,13 @@
 - Befund 3 nicht geändert: laut Review fail-safe und akzeptabel.
 - Kein Commit in diesem Paket, weil es nichts zu ändern gab.
 - LICENSE enthält 'toweb GmbH' als Copyright-Inhaber, das ist der Herausgeber des Pakets (Vendor towebgmbh) und kein Kundenname.
+
+## Package 14: Paket 10 erneut reviewen
+- Kept the verdict blocking for AC-12 because the spec counts any hit of the name search as blocking; the code has no blocking finding.
+- Code diff since b6b8454 outside docs/plans is empty, so I re-verified by running the checks and spot-checking provider, dependencies, budget test and BOOST_VERSION instead of a full line-by-line re-read; package 12 reviewed the same code in full.
+- Ran Pest with --compact --colors=never for the reported check (196 passed).
+- Ran git grep with -c instead of -n to get per-file counts; line numbers come from an earlier -n run.
+- Added two extra searches: tree outside docs/plans and code history (git log -p) outside docs/plans, both without hits.
+- The searches without matches are reported with exit 0 as the Bash tool recorded them (it treats grep's no-match as success); they printed nothing or a count of 0.
+- Only Laravel 13 / Boost 2.10.4 run locally; the Laravel 12 and lowest-Boost matrix was not run.
+- Did not run the shell wrapper stub: the Jarvis guard blocks unwritten scripts; it is unchanged since package 10.

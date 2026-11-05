@@ -177,8 +177,8 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 11 | fix | Review-Befunde von Paket 10 beheben | done | default | `fd15284…97b6ceb` | – |
 | 12 | review | Paket 10 erneut reviewen | done | opus | none | blocking |
 | 13 | fix | Review-Befunde von Paket 10 beheben | done | default | none | – |
-| 14 | review | Paket 10 erneut reviewen | running | opus | – | – |
-| 15 | implement | kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht | pending | opus | – | – |
+| 14 | review | Paket 10 erneut reviewen | done | opus | none | blocking |
+| 15 | implement | kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht | running | opus | – | – |
 | 16 | implement | kit:doctor, wöchentlicher Boost-Drift-Lauf und README | pending | sonnet | – | – |
 | 17 | implement | Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job | pending | sonnet | – | – |
 | 18 | review | Schluss-Review gegen alle Abnahmekriterien | pending | opus | – | – |

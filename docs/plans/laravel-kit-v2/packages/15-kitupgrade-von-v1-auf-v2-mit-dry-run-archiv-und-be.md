@@ -2,7 +2,7 @@
 
 # Package 15: kit:upgrade von v1 auf v2 mit Dry-Run, Archiv und Bericht
 
-Kind: implement · Status: pending · Model: opus · Effort: high · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: opus · Effort: high · Commits: – · Verdict: –
 
 ## Spec
 
