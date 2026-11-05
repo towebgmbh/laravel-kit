@@ -1,0 +1,71 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  tests:
+    name: PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }}, Boost ${{ matrix.boost }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.3', '8.4']
+        laravel: ['12', '13']
+        boost: [lowest, latest]
+        include:
+          - laravel: '12'
+            testbench: '^10.0'
+          - laravel: '13'
+            testbench: '^11.0'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Pin Laravel and Testbench
+        run: composer require "laravel/framework:^${{ matrix.laravel }}.0" "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update
+
+      - name: Pin the lowest Boost
+        if: matrix.boost == 'lowest'
+        run: composer require "laravel/boost:2.10.0" --no-update
+
+      - name: Install dependencies
+        run: composer update --prefer-dist --no-interaction --with-all-dependencies
+
+      - name: Run tests
+        run: vendor/bin/pest
+
+  smoke:
+    name: Smoke test (fresh Laravel 13 app)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: mbstring, openssl, pdo, pdo_sqlite, sqlite3, tokenizer, xml, ctype, fileinfo, curl, zip
+          tools: composer:v2
+          coverage: none
+
+      - run: bash scripts/smoke.sh
+
+  pint:
+    name: Pint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - run: composer install --prefer-dist --no-interaction
+
+      - run: vendor/bin/pint --test

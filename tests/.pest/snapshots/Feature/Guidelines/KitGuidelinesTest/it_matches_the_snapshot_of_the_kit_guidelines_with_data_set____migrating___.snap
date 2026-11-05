@@ -1,0 +1,91 @@
+=== towebgmbh/laravel-kit/architecture rules ===
+
+# Architecture
+
+- Organise code by domain, not by type: `app/Billing/`, `app/Catalog/`. Shared code goes to `app/Support/`.
+- New code goes into Actions; existing Service classes are converted when you change them anyway.
+- An Action lives in `app/{Domain}/Actions/`, is named as a verb (`CreateInvoice`) and has one public method `handle()`. Do not convert code you do not touch.
+- Controllers are thin and singular (`InvoiceController`): validate with a Form Request, call the business logic, return the response.
+- Pass more than 3 parameters as a DTO: a `final readonly class` in `app/{Domain}/DTOs/`, named as a noun (`InvoiceData`).
+- Authorise with Policies, found by auto-discovery or linked with `#[UsePolicy]`.
+- Use enums in `app/{Domain}/Enums/` for statuses and fixed value sets.
+- Models declare their setup with attributes (`#[Table]`, `#[Fillable]`, `#[UsePolicy]`, `#[ObservedBy]`, `#[ScopedBy]`, `#[UseFactory]`) and casts in `casts()`. Never make a model unguarded.
+- Models hold relationships, scopes, accessors and casts, no business logic.
+
+=== towebgmbh/laravel-kit/conventions rules ===
+
+# Conventions
+
+- Within a domain, classes go to their own folder: `app/{Domain}/Models/`, `DTOs/`, `Enums/`, `Policies/`, `Jobs/`, `Events/`, `Listeners/`, `Notifications/`, `Mail/`, `Resources/`, `Queries/`, `Rules/`. Create a folder only when the first class needs it.
+- Names: models singular (`Invoice`), controllers singular plus `Controller` (`InvoiceController`), Form Requests verb plus noun plus `Request` (`StoreInvoiceRequest`), Policies model plus `Policy`, API Resources model plus `Resource`, Jobs and Notifications describe what happens (`SendInvoiceReminder`, `InvoicePaid`).
+- Routes: group them by domain with prefix and middleware; URIs are plural kebab-case (`/credit-notes`). Web routes return views or redirects, API routes return Resources.
+- Migrations: one change per migration, descriptive snake_case names (`create_invoices_table`, `add_status_to_invoices_table`).
+- Jobs and Listeners stay thin and call an Action or service for the business logic.
+- Side effects (mails, syncs, logging) go through Events and Listeners; Observers only for simple model lifecycle hooks.
+- Mail templates live in `resources/views/mail/{domain}/`. Config per domain goes to `config/{domain}.php`.
+
+=== towebgmbh/laravel-kit/core rules ===
+
+# Laravel Kit
+
+The Laravel Kit sets the structure and the workflow of this project. Boost's guidelines and skills cover the framework and package APIs of the installed versions; the kit does not repeat them.
+
+## Size Rule
+
+Classify every piece of work as small, medium or large, state the size in one sentence and start without asking; the user may reclassify it at any time.
+
+- **Small** (fix, adjustment, few files, no new behaviour across layers): implement directly and run only the affected tests. No spec, no plan. Update the docs only when documented behaviour or structure changes.
+- **Medium** (several layers, or a change of existing behaviour): give a short plan in the chat, implement, then update the affected spec entry and the docs.
+- **Large** (new feature, new domain, initiative): write a spec with `/kit-spec` and get the user's approval. The spec numbers its acceptance criteria (`AC-1`, `AC-2`, ...). Do not implement while the spec lists a blocking open question; ask instead of guessing.
+- Build large work in the phases Data, Logic, Routes, Frontend, Integration. Each phase is committable and leaves the app working. Write tests with the code, run only the affected tests per phase and never the complete suite per phase. Tests name the criterion they cover.
+
+## Documentation
+
+- Keeping `docs/` up to date is a standing request of the user, so the rule to create documentation only on request does not apply to `docs/`.
+- The domain folders listed in the project docs are approved base folders.
+- The docs must always match the code: updating them is part of the definition of done (see the size rule).
+- Read `docs/GUIDELINES.md` first.
+- `docs/GUIDELINES.md` holds the domains and project rules, `docs/SPECIFICATIONS.md` the specs, `docs/DECISIONS.md` the decisions.
+- When the project reaches 4 domains, run `/kit-docs-split`.
+- Record deviations from the kit as rules in `.ai/rules` with Boost's `record-rule` MCP tool. Without it, write the rule file in `.ai/rules` by hand, or report the rule text to the user.
+
+## Tests
+
+- Follow the test line in the Test Enforcement rules.
+
+=== towebgmbh/laravel-kit/quality rules ===
+
+# Quality
+
+## Definition of Done
+
+- Tests follow the test line and the affected tests pass.
+- Pint is clean on the changed files.
+- The docs are updated as the size rule requires.
+- Review your own diff before you present it: structure, naming, leftovers, scope.
+- Migrations are reversible.
+
+## Code
+
+- No `TODO`, `FIXME` or commented-out code, no `dd()`, `dump()`, `ray()` or `console.log()` in committed code.
+- No hard-coded values that belong in config, enums or constants.
+- Domain errors get their own exceptions (`InvoiceAlreadyPaid`). Never swallow an exception silently; log or rethrow it.
+
+## Security
+
+- Validate every input (Form Requests for controllers, component validation in Livewire) and authorise every action with a Policy or Gate.
+- Never commit `.env` files, credentials, tokens or API keys, and never paste them into docs or specs.
+
+## Commits
+
+- One logical change per commit, with a short imperative message. Do not mix refactoring with features.
+
+=== towebgmbh/laravel-kit/stack rules ===
+
+## Stack: Blade with Alpine
+
+- Pages are Blade views in `resources/views/{domain}/`; shared UI is anonymous Blade components in `resources/views/components/`.
+- Declare every component's inputs with `@props` at the top of the file; no logic beyond presentation.
+- Use Alpine for client-side behaviour that needs no server round trip. Keep the Alpine code in the view or a module in `resources/js/`.
+- Style with Tailwind 4 utility classes; extract repeated markup into components, not into custom CSS.
+- Assets go through Vite: entry points in `resources/js/app.js` and `resources/css/app.css`.
