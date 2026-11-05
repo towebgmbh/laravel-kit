@@ -58,3 +58,14 @@
 - ProjectDetector ignores .gitkeep in database/migrations; it is an instance class like StackDetector, ComposerPackages::has is static as specified.
 - tests/TestCase setUp re-runs BoostServiceProvider::register() when RuleRepository is unbound (Boost singletons were missing in tests; package 2's env=local alone was not enough for boost:update).
 - Dropped a planned test that a foreign boost.json package survives: Boost's own install prunes uninstalled packages; duplicate-free packages are covered by the second-run test.
+
+## Package 8: Claude-Stop-Hooks: Pint einmal pro Turn und struktureller Doku-Wächter
+- ClaudeSettings decodes JSON as stdClass so empty objects (e.g. "env": {}) survive the round trip; JSON_UNESCAPED_UNICODE added to the spec's pretty print and unescaped slashes.
+- ClaudeSettings also returns invalid (writes nothing) when the root is not an object, hooks is not an object or hooks.Stop is not a list.
+- DocsGuard skips isMeta user entries when looking for the last prompt, so injected meta messages do not reset the turn.
+- DocsGuard asks isTracked only for paths under app/, resources/js/ and resources/views/ (migrations and routes are structural regardless).
+- A config/kit.php that throws on include keeps the guard on (only an explicit false disables it).
+- bin/kit-docs-guard exits 0 silently when no autoloader or the DocsGuard class is found.
+- Added public const InstallCommand::DOCS_GUARD_SCRIPT and DocsGuard::REASON; install table gets a .claude/settings.json row with the merge result.
+- Extra tests beyond spec: MultiEdit and NotebookEdit paths, new Blade view, binary run via proc_open, invalid settings warning in kit:install, merge into existing settings in kit:install.
+- Skipped running the shell wrapper manually: the Jarvis guard blocks running scripts written via heredoc; the binary itself is covered by a test.

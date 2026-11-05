@@ -2,7 +2,7 @@
 
 # Package 9: kit:update mit Diff und Rückfrage
 
-Kind: implement · Status: pending · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

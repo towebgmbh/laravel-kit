@@ -2,7 +2,7 @@
 
 # Package 8: Claude-Stop-Hooks: Pint einmal pro Turn und struktureller Doku-Wächter
 
-Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: opus · Effort: medium · Commits: `18acd27…0d36eb8` · Verdict: –
 
 ## Spec
 
@@ -54,3 +54,36 @@ Serves: AC-4, AC-6, AC-12
 ## Out of scope
 
 - `kit:update` (package 9), `kit:upgrade` (package 11), `kit:doctor` and README (package 12), smoke script (package 13).
+
+## Report
+
+Added the Claude Code extras to kit:install: DocsGuard (structural docs guard, fail open), bin/kit-docs-guard (composer bin), the wrapper stub .claude/hooks/kit-docs-guard.sh, ClaudeSettings::merge() adding the two Stop hooks (Pint once per turn, docs guard) without any PostToolUse hook, and InstallCommand::installAgentExtras() gated on the claude_code agent. New DocsGuardTest and ClaudeSettingsTest, extended InstallCommandTest. 185 tests green, Pint clean, composer validate --strict ok. Two commits.
+
+## Handoff
+
+Files: src/Hooks/DocsGuard.php (public const REASON; constructor ?Closure $isTracked(cwd, path): ?bool, default git via symfony/process), bin/kit-docs-guard (composer "bin"), stubs/claude/hooks/kit-docs-guard.sh (0755), src/Support/ClaudeSettings.php (consts PATH, PINT_COMMAND, DOCS_GUARD_COMMAND, results created/updated/unchanged/invalid), InstallCommand::installAgentExtras() plus public const DOCS_GUARD_SCRIPT.
+- Package 9 (kit:update): the hook script is a managed file in the manifest (write via ManagedFiles::write, then chmod 0755 unless SKIPPED). Re-run ClaudeSettings::merge() too; it's idempotent and matches by command text (Pint: exact command; guard: any Stop command containing kit-docs-guard.sh). Only do it when boost.json agents contain claude_code (reads them with new BoostConfig().getAgents()).
+- The install summary table now has two more rows after the docs: '.claude/hooks/kit-docs-guard.sh' and '.claude/settings.json' (with the merge result) before '.ai/kit-manifest.json'. Fixtures with claude_code record 3 manifest files (2 without Pest).
+- Package 12/doctor: settings.json is never hashed; an invalid settings.json gets a warning in install and stays untouched.
+- DocsGuard treats user entries with isMeta=true or with tool_result blocks as non-prompts; broken JSONL lines are skipped. Paths outside cwd are ignored for the structural check.
+- Watch: the Jarvis PreToolUse guard refuses Bash heredocs that touch Claude settings paths and running scripts it did not see written via Write; use the Write tool for such files.
+- D-1: staged diff grepped against the package 13 name list, only hits are the Towebgmbh namespace; commit messages are generic.
+
+## Decisions
+
+- ClaudeSettings decodes JSON as stdClass so empty objects (e.g. "env": {}) survive the round trip; JSON_UNESCAPED_UNICODE added to the spec's pretty print and unescaped slashes.
+- ClaudeSettings also returns invalid (writes nothing) when the root is not an object, hooks is not an object or hooks.Stop is not a list.
+- DocsGuard skips isMeta user entries when looking for the last prompt, so injected meta messages do not reset the turn.
+- DocsGuard asks isTracked only for paths under app/, resources/js/ and resources/views/ (migrations and routes are structural regardless).
+- A config/kit.php that throws on include keeps the guard on (only an explicit false disables it).
+- bin/kit-docs-guard exits 0 silently when no autoloader or the DocsGuard class is found.
+- Added public const InstallCommand::DOCS_GUARD_SCRIPT and DocsGuard::REASON; install table gets a .claude/settings.json row with the merge result.
+- Extra tests beyond spec: MultiEdit and NotebookEdit paths, new Blade view, binary run via proc_open, invalid settings warning in kit:install, merge into existing settings in kit:install.
+- Skipped running the shell wrapper manually: the Jarvis guard blocks running scripts written via heredoc; the binary itself is covered by a test.
+
+## Checks
+
+- `composer validate --strict`: exit 0, ./composer.json is valid
+- `vendor/bin/pest`: exit 0, 185 passed (637 assertions)
+- `vendor/bin/pint --test`: exit 0, passed
+- `printf '{"stop_hook_active":true}' | bin/kit-docs-guard; echo "exit=$?"`: exit 0, no output, exit=0
