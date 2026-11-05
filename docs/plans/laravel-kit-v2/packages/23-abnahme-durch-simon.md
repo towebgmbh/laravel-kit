@@ -2,7 +2,7 @@
 
 # Package 23: Abnahme durch Simon
 
-Kind: acceptance · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: acceptance · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

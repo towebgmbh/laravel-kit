@@ -180,3 +180,14 @@
 - Finding 2: the hint depends only on whether .claude/.kit-version exists; it also applies to rule-file leftovers, whose old test message changed accordingly.
 - Did not run the smoke script; it needs network and the changed check is not part of it.
 - D-1: checked the diff and commit message for customer names; none, fixtures are generic.
+
+## Package 22: Paket 18 erneut reviewen
+- Kept the verdict blocking for AC-12 because the spec counts any hit of the name search as blocking; the code has no blocking finding and the fix needs Jarvis or the owner.
+- Reviewed the package 21 diff line by line; re-verified the rest by re-running all checks incl. smoke instead of a full re-read, since code outside the diff is unchanged since package 20.
+- Ran the name search with -c (per-file counts) instead of -n.
+- Ran the email search with docs/plans excluded so plan text quoting the placeholder does not hide real hits.
+- Added a search over the code history outside docs/plans (git log -p): no hits.
+- The no-match greps are reported with exit 0 as the Bash tool recorded them (they end with echo); grep itself printed exit 1 / count 0.
+- Rated the .claude/rules 'Remove them' hint non-blocking: warning only, exit 0 per D-27.
+- Only Laravel 13 / Boost 2.10.4 ran locally; Laravel 12, Boost 2.10.0 and the GitHub workflows were not run.
+- Did not run the shell wrapper stub by hand; it is unchanged since package 10 and the smoke test installs it.
