@@ -141,6 +141,10 @@ final class BoostFixture
         $app->setBasePath($this->root);
         $app->forgetInstance(ProjectManager::class);
 
+        // Boost 2.10.0 always writes the Claude Code guidelines to AGENTS.md; later versions pick
+        // CLAUDE.md when it exists. Pin CLAUDE.md so the tests read it on every Boost version.
+        config(['boost.agents.claude_code.guidelines_path' => 'CLAUDE.md']);
+
         return $this;
     }
 
