@@ -79,3 +79,13 @@ Classify every piece of work as small, medium or large, state the size in one se
 ## Commits
 
 - One logical change per commit, with a short imperative message. Do not mix refactoring with features.
+
+=== towebgmbh/laravel-kit/stack rules ===
+
+## Stack: Blade with Alpine
+
+- Pages are Blade views in `resources/views/{domain}/`; shared UI is anonymous Blade components in `resources/views/components/`.
+- Declare every component's inputs with `@props` at the top of the file; no logic beyond presentation.
+- Use Alpine for client-side behaviour that needs no server round trip. Keep the Alpine code in the view or a module in `resources/js/`.
+- Style with Tailwind 4 utility classes; extract repeated markup into components, not into custom CSS.
+- Assets go through Vite: entry points in `resources/js/app.js` and `resources/css/app.css`.
