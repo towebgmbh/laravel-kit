@@ -156,3 +156,10 @@
 - Tried to run one CI matrix cell (Laravel 12, Boost 2.10.0) in an ignored build/ copy. The Jarvis guard blocked git archive in a review turn, so the Laravel 12 and lowest-Boost cells were checked by reading only. Locally only PHP 8.5, Laravel 13 and Boost 2.10.4 ran.
 - Ran Pest with --compact --colors=never for the reported check; an earlier full-output run gave the same result (263 passed, 2 skipped).
 - Did not run the stubs/claude/hooks/kit-docs-guard.sh wrapper by hand. It is unchanged since package 10; the smoke test checks it is installed, and DocsGuardTest runs the binary.
+
+## Package 19: Review-Befunde von Paket 18 beheben
+- Finding 1 (AC-12, name list in tracked docs/plans files) not addressed: docs/plans is read-only for packages and the fix needs a history rewrite by Jarvis or the owner.
+- Finding 5: chose the label fix (default, no Deviations section) instead of treating a missing section as undecided; D-30 behaviour stays unchanged (missing section gives actions).
+- Finding 5: no new resolver test, because ArchitectureResolverTest already covers 'missing section' => actions; added a command-level test for the label instead.
+- Finding 4: .claude/rules files still come from the *.md glob (as before), not from V1Inventory::paths(), so unknown project rules there still count as leftovers; the new check skips the rule paths of paths() to avoid duplicates.
+- D-1: I checked the diff and the commit message for customer names; none, the fixtures are generic.

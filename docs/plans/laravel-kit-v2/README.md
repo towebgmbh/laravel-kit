@@ -182,8 +182,8 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 16 | implement | kit:doctor, wöchentlicher Boost-Drift-Lauf und README | done | sonnet | `3a4aef6…3400c51` | – |
 | 17 | implement | Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job | done | sonnet | `3056fc0…ab589b2` | – |
 | 18 | review | Schluss-Review gegen alle Abnahmekriterien | done | opus | none | blocking |
-| 19 | fix | Review-Befunde von Paket 18 beheben | running | default | – | – |
-| 20 | review | Paket 18 erneut reviewen | pending | opus | – | – |
+| 19 | fix | Review-Befunde von Paket 18 beheben | done | default | `637dcef…af9a5d0` | – |
+| 20 | review | Paket 18 erneut reviewen | running | opus | – | – |
 | 21 | acceptance | Abnahme durch Simon | pending | opus | – | – |
 
 Each package's spec, report, handoff, decisions, checks and findings are in `packages/`; every reported decision is in `decisions.md`.
