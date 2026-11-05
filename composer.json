@@ -16,6 +16,9 @@
         "orchestra/testbench": "^10.0|^11.0",
         "pestphp/pest": "^3.8|^4.1|^5.0"
     },
+    "bin": [
+        "bin/kit-docs-guard"
+    ],
     "autoload": {
         "psr-4": {
             "Towebgmbh\\LaravelKit\\": "src/"

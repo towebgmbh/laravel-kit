@@ -1,0 +1,29 @@
+#!/usr/bin/env php
+<?php
+
+// Claude Code Stop hook: asks for docs after structural changes. Always exits 0.
+
+$autoloaders = array_filter([
+    $GLOBALS['_composer_autoload_path'] ?? null,
+    __DIR__.'/../vendor/autoload.php',
+    __DIR__.'/../../../autoload.php',
+]);
+
+foreach ($autoloaders as $autoloader) {
+    if (is_file($autoloader)) {
+        require $autoloader;
+        break;
+    }
+}
+
+if (! class_exists(Towebgmbh\LaravelKit\Hooks\DocsGuard::class)) {
+    exit(0);
+}
+
+$output = (new Towebgmbh\LaravelKit\Hooks\DocsGuard)->handle((string) stream_get_contents(STDIN));
+
+if ($output !== null) {
+    fwrite(STDOUT, $output.PHP_EOL);
+}
+
+exit(0);
