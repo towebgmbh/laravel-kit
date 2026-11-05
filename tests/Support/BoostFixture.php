@@ -7,6 +7,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Laravel\Roster\ProjectManager;
 use RuntimeException;
 use Towebgmbh\LaravelKit\Kit;
+use Towebgmbh\LaravelKit\Overrides;
 
 /**
  * A throw-away Laravel project in which Boost sees the kit as a direct
@@ -119,6 +120,16 @@ final class BoostFixture
     public function putJson(string $relative, array $data): self
     {
         return $this->put($relative, json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)."\n");
+    }
+
+    /** Copies the kit's override stubs to their project paths, as kit:install does. */
+    public function withOverrides(): self
+    {
+        foreach (array_keys(Overrides::all()) as $path) {
+            $this->put($path, Overrides::stub($path));
+        }
+
+        return $this;
     }
 
     /**
