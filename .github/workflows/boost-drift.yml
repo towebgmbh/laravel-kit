@@ -1,0 +1,25 @@
+name: boost-drift
+
+# GitHub runs scheduled and manual workflows only from the default branch.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  drift:
+    name: Boost overrides still match
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Install the latest Boost
+        run: composer update --prefer-dist --no-interaction --with-all-dependencies
+
+      - name: Compare Boost files with the override references
+        run: KIT_BOOST_DRIFT=1 vendor/bin/pest tests/Drift

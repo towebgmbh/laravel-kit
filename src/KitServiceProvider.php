@@ -3,6 +3,7 @@
 namespace Towebgmbh\LaravelKit;
 
 use Illuminate\Support\ServiceProvider;
+use Towebgmbh\LaravelKit\Console\DoctorCommand;
 use Towebgmbh\LaravelKit\Console\InstallCommand;
 use Towebgmbh\LaravelKit\Console\UpdateCommand;
 use Towebgmbh\LaravelKit\Console\UpgradeCommand;
@@ -30,6 +31,7 @@ class KitServiceProvider extends ServiceProvider
         ], 'kit-config');
 
         $this->commands([
+            DoctorCommand::class,
             InstallCommand::class,
             UpdateCommand::class,
             UpgradeCommand::class,
