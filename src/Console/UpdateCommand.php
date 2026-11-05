@@ -3,6 +3,7 @@
 namespace Towebgmbh\LaravelKit\Console;
 
 use Illuminate\Console\Command;
+use InvalidArgumentException;
 use Laravel\Boost\Support\Config as BoostConfig;
 use SebastianBergmann\Diff\Differ;
 use SebastianBergmann\Diff\Output\StrictUnifiedDiffOutputBuilder;
@@ -34,7 +35,13 @@ class UpdateCommand extends Command
         $this->pending = [];
         $basePath = base_path();
 
-        $manifest = Manifest::load($basePath);
+        try {
+            $manifest = Manifest::load($basePath);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage().'. Fix or delete it, then run php artisan kit:install.');
+
+            return self::FAILURE;
+        }
 
         if (! $manifest->exists()) {
             $this->error('The kit is not installed. Run php artisan kit:install.');
@@ -101,8 +108,13 @@ class UpdateCommand extends Command
 
             $contents = Overrides::stub($path);
             $this->pending[$path] = $contents;
-            $this->record($path, $files->write($path, $contents));
-            $manifest->recordOverride($path, $override['boost_file'], $override['boost_sha256']);
+            $result = $files->write($path, $contents);
+            $this->record($path, $result);
+
+            // A kept local override stays based on the Boost text it was written for.
+            if ($result !== ManagedFiles::SKIPPED || ! isset($manifest->overrides()[$path])) {
+                $manifest->recordOverride($path, $override['boost_file'], $override['boost_sha256']);
+            }
         }
     }
 

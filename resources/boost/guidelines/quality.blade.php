@@ -16,7 +16,7 @@
 
 ## Security
 
-- Validate every input with a Form Request and authorise every action with a Policy or Gate.
+- Validate every input (Form Requests for controllers, component validation in Livewire) and authorise every action with a Policy or Gate.
 - Never commit `.env` files, credentials, tokens or API keys, and never paste them into docs or specs.
 
 ## Commits

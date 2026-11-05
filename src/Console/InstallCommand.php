@@ -3,6 +3,7 @@
 namespace Towebgmbh\LaravelKit\Console;
 
 use Illuminate\Console\Command;
+use InvalidArgumentException;
 use Laravel\Boost\Support\Config as BoostConfig;
 use Towebgmbh\LaravelKit\Kit;
 use Towebgmbh\LaravelKit\Manifest;
@@ -56,6 +57,14 @@ class InstallCommand extends Command
 
         $basePath = base_path();
 
+        try {
+            $manifest = Manifest::load($basePath);
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage().'. Fix or delete it, then run kit:install again.');
+
+            return self::FAILURE;
+        }
+
         $stack = $this->resolveStack($basePath);
 
         if ($stack === null) {
@@ -78,7 +87,7 @@ class InstallCommand extends Command
 
         $files = new ManagedFiles(
             $basePath,
-            Manifest::load($basePath),
+            $manifest,
             (bool) $this->option('force'),
             fn (string $path): bool => $this->input->isInteractive()
                 && confirm("[{$path}] differs from the kit version. Replace it?", default: false),
@@ -93,7 +102,6 @@ class InstallCommand extends Command
 
         $this->installAgentExtras($files);
 
-        $manifest = $files->manifest();
         $manifest->setVersion(Kit::VERSION);
         $manifest->setProject($project);
         $manifest->save();
@@ -253,8 +261,13 @@ class InstallCommand extends Command
                 continue;
             }
 
-            $this->record($path, $files->write($path, Overrides::stub($path)));
-            $files->manifest()->recordOverride($path, $override['boost_file'], $override['boost_sha256']);
+            $result = $files->write($path, Overrides::stub($path));
+            $this->record($path, $result);
+
+            // A kept local override stays based on the Boost text it was written for.
+            if ($result !== ManagedFiles::SKIPPED || ! isset($files->manifest()->overrides()[$path])) {
+                $files->manifest()->recordOverride($path, $override['boost_file'], $override['boost_sha256']);
+            }
         }
     }
 

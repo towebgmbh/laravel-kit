@@ -251,6 +251,34 @@ it('fails without boost.json', function () {
     expect($this->fixture->path('.ai'))->not->toBeDirectory();
 });
 
+it('fails with a message on an invalid manifest', function () {
+    $this->fixture = kitInstallFixture();
+    $this->fixture->put('.ai/kit-manifest.json', '{broken');
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])
+        ->expectsOutputToContain('The kit manifest is not valid JSON')
+        ->assertFailed();
+
+    expect($this->fixture->path('config/kit.php'))->not->toBeFile();
+});
+
+it('keeps the recorded Boost hash of a kept override', function () {
+    $this->fixture = kitInstallFixture();
+    $path = '.ai/guidelines/enforce-tests.blade.php';
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])->assertSuccessful();
+
+    $manifest = kitJson($this->fixture, '.ai/kit-manifest.json');
+    $manifest['overrides'][$path]['boost_sha256'] = 'hash-of-an-older-boost-text';
+    $this->fixture->put('.ai/kit-manifest.json', json_encode($manifest));
+    $this->fixture->put($path, "local edit\n");
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])->assertSuccessful();
+
+    expect(kitJson($this->fixture, '.ai/kit-manifest.json')['overrides'][$path]['boost_sha256'])
+        ->toBe('hash-of-an-older-boost-text');
+});
+
 it('leaves an existing config untouched and warns when it differs', function () {
     $this->fixture = kitInstallFixture();
     $this->fixture->put('config/kit.php', "<?php return ['stack' => 'blade'];\n");

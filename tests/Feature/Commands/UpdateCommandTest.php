@@ -90,10 +90,37 @@ it('asks before replacing an edited override interactively', function () {
     app()['env'] = 'testing';
 
     $this->artisan('kit:update')
+        ->expectsOutputToContain('+++ '.KIT_ENFORCE.' (kit)')
         ->expectsConfirmation('Replace ['.KIT_ENFORCE.'] with the kit version?', 'yes')
         ->assertSuccessful();
 
     expect(file_get_contents($f->path(KIT_ENFORCE)))->toBe($kit);
+});
+
+it('keeps the recorded Boost hash of an override the user kept', function () {
+    $this->fixture = kitUpdateFixture();
+    $f = $this->fixture;
+    $manifest = kitUpdateManifest($f);
+    $manifest['overrides'][KIT_ENFORCE]['boost_sha256'] = 'hash-of-an-older-boost-text';
+    file_put_contents($f->path(Manifest::PATH), json_encode($manifest));
+    file_put_contents($f->path(KIT_ENFORCE), "local edit\n");
+
+    $this->artisan('kit:update', ['--no-interaction' => true])->assertSuccessful();
+
+    expect(kitUpdateManifest($f)['overrides'][KIT_ENFORCE]['boost_sha256'])->toBe('hash-of-an-older-boost-text');
+
+    $this->artisan('kit:update', ['--force' => true, '--no-interaction' => true])->assertSuccessful();
+
+    expect(kitUpdateManifest($f)['overrides'][KIT_ENFORCE]['boost_sha256'])->not->toBe('hash-of-an-older-boost-text');
+});
+
+it('fails with a message on an invalid manifest', function () {
+    $this->fixture = kitUpdateFixture();
+    file_put_contents($this->fixture->path(Manifest::PATH), '{broken');
+
+    $this->artisan('kit:update', ['--no-interaction' => true])
+        ->expectsOutputToContain('The kit manifest is not valid JSON')
+        ->assertFailed();
 });
 
 it('adds pest/core when Pest appears and removes it when Pest is gone', function () {

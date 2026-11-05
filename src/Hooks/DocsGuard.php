@@ -25,12 +25,20 @@ final class DocsGuard
     /** @var Closure(string, string): ?bool */
     private readonly Closure $isTracked;
 
+    /** @var Closure(string, string, int): bool */
+    private readonly Closure $addedSince;
+
+    /** Start of the current turn (time of the last prompt), when the transcript has one. */
+    private ?int $turnStart = null;
+
     /**
      * @param  (Closure(string $cwd, string $path): ?bool)|null  $isTracked  true when git tracks the path, false when not, null outside a git work tree
+     * @param  (Closure(string $cwd, string $path, int $since): bool)|null  $addedSince  true when a commit since the timestamp added the path
      */
-    public function __construct(?Closure $isTracked = null)
+    public function __construct(?Closure $isTracked = null, ?Closure $addedSince = null)
     {
         $this->isTracked = $isTracked ?? self::gitIsTracked(...);
+        $this->addedSince = $addedSince ?? self::gitAddedSince(...);
     }
 
     /** Returns the hook output, or null to let the agent stop. */
@@ -110,6 +118,7 @@ final class DocsGuard
     private function editsOfLastTurn(array $lines, string $cwd): array
     {
         $edits = [];
+        $this->turnStart = null;
 
         foreach ($lines as $line) {
             $entry = json_decode($line, true);
@@ -123,6 +132,8 @@ final class DocsGuard
 
             if ($type === 'user' && $this->isPrompt($entry, $content)) {
                 $edits = [];
+                $time = is_string($entry['timestamp'] ?? null) ? strtotime($entry['timestamp']) : false;
+                $this->turnStart = $time === false ? null : $time;
 
                 continue;
             }
@@ -211,7 +222,12 @@ final class DocsGuard
             return in_array('Write', $tools, true);
         }
 
-        return $tracked === false;
+        if ($tracked === false) {
+            return true;
+        }
+
+        // The agent may have committed the new file during the turn.
+        return $this->turnStart !== null && ($this->addedSince)($cwd, $path, $this->turnStart);
     }
 
     private static function gitIsTracked(string $cwd, string $path): ?bool
@@ -227,5 +243,13 @@ final class DocsGuard
         $ls->run();
 
         return $ls->isSuccessful();
+    }
+
+    private static function gitAddedSince(string $cwd, string $path, int $since): bool
+    {
+        $log = new Process(['git', '-C', $cwd, 'log', '--diff-filter=A', '--since='.$since, '--format=%H', '-n', '1', '--', $path]);
+        $log->run();
+
+        return $log->isSuccessful() && trim($log->getOutput()) !== '';
     }
 }

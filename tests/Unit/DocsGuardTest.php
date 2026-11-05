@@ -199,6 +199,28 @@ it('asks git whether a file is new', function () {
     expectBlock($guard->handle(guardInput($this, guardTurn($this, [['Edit', 'app/Billing/Actions/SendInvoice.php']]))));
 });
 
+it('counts a file the agent committed during the turn as new', function () {
+    $git = 'git -C '.escapeshellarg($this->dir).' -c user.name=Test -c user.email=test@example.com';
+    exec('git -C '.escapeshellarg($this->dir).' init -q');
+    mkdir($this->dir.'/app/Billing/Actions', 0755, true);
+    file_put_contents($this->dir.'/app/Billing/Actions/Old.php', "<?php\n");
+    exec("{$git} add app && GIT_COMMITTER_DATE=2020-01-01T00:00:00 {$git} commit -q -m old --date=2020-01-01T00:00:00");
+    file_put_contents($this->dir.'/app/Billing/Actions/CreateInvoice.php', "<?php\n");
+    exec("{$git} add app && {$git} commit -q -m new");
+    $guard = new DocsGuard;
+
+    $turn = function (string $timestamp, string $file) {
+        $entries = guardTurn($this, [['Write', "app/Billing/Actions/{$file}"]]);
+        $entries[0]['timestamp'] = $timestamp;
+
+        return guardInput($this, $entries);
+    };
+
+    expectBlock($guard->handle($turn(gmdate('Y-m-d\TH:i:s.000\Z', time() - 60), 'CreateInvoice.php')));
+    expect($guard->handle($turn(gmdate('Y-m-d\TH:i:s.000\Z', time() + 60), 'CreateInvoice.php')))->toBeNull()
+        ->and($guard->handle($turn(gmdate('Y-m-d\TH:i:s.000\Z', time() - 60), 'Old.php')))->toBeNull();
+});
+
 it('falls back to Write outside a git repository', function () {
     $guard = new DocsGuard;
 
