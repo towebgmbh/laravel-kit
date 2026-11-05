@@ -2,7 +2,7 @@
 
 # Package 3: Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides
 
-Kind: implement · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

@@ -165,8 +165,8 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | # | Kind | Title | Status | Model | Commits | Verdict |
 |---|---|---|---|---|---|---|
 | 1 | implement | Grundgerüst: composer.json, Kit, Config, Provider, Manifest, Pint und CI | done | sonnet | `839cc85…c7407dc` | – |
-| 2 | implement | Testbench-Harness mit Boost-Fixture und niedrigste Boost-Version | running | opus | – | – |
-| 3 | implement | Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides | pending | opus | – | – |
+| 2 | implement | Testbench-Harness mit Boost-Fixture und niedrigste Boost-Version | done | opus | `5ddd70c…9964038` | – |
+| 3 | implement | Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides | running | opus | – | – |
 | 4 | implement | Stack-Varianten mit @scoped, Stack-Erkennung und Kontextbudget-Test | pending | sonnet | – | – |
 | 5 | implement | Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief | pending | sonnet | – | – |
 | 6 | implement | Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle | pending | opus | – | – |

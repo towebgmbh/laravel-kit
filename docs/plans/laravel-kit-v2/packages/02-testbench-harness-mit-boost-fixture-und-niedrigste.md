@@ -2,7 +2,7 @@
 
 # Package 2: Testbench-Harness mit Boost-Fixture und niedrigste Boost-Version
 
-Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: opus · Effort: medium · Commits: `5ddd70c…9964038` · Verdict: –
 
 ## Spec
 
@@ -54,3 +54,24 @@ Serves: AC-1, AC-2, AC-12
 - Guideline content, overrides and contradiction tests (package 3).
 - Stack guideline, `StackDetector` and the context budget test (package 4).
 - Skills and commands (packages 5 to 12).
+
+## Report
+
+Testbench harness in place: tests/TestCase.php (Boost, Roster and Kit providers, env local), tests/Support/BoostFixture.php (throw-away project with composer.json/lock, CLAUDE.md, AGENTS.md, boost.json, optional package.json/package-lock.json, vendor symlink to the package), tests/Support/Guidelines.php (compose/text/kitOnly/lineCount via GuidelineComposer), placeholder resources/boost/guidelines/core.blade.php. BoostDiscoveryTest and ServiceProviderTest prove discovery, selection filtering, enforce-tests and config defaults. 17 tests green on Boost 2.10.4 and on 2.10.0, so the lowest Boost stays 2.10.0 (no constraint or workflow change).
+
+## Handoff
+
+Use `BoostFixture::create(composerPackages, npmPackages, boostJson, pest)` + `Guidelines::compose($fixture, enforceTests, packages)`; always `$fixture->destroy()` in afterEach. Packages can be given as names (version from InstalledVersions, fallback 1.0.0) or name => version (e.g. ['livewire/livewire' => '4.0.0'], ['@inertiajs/vue3' => '3.0.0']). Lock entries use "v"-prefixed versions; composer.json constraints are "^x.y.z". laravel/framework in the lock takes app()->version(). `activate()` sets the base path and forgets ProjectManager so Roster rescans; GuidelineComposer is resolved fresh each call. Boost registers just by setting $app['env']='local' in defineEnvironment (no manual singleton binding needed); `boost:update` is available via Artisan. The fixture writes no `.ai/` dir; put overrides with `$fixture->put('.ai/guidelines/...', ...)`. tests/Pest.php binds Tests\TestCase to Feature and Drift; Unit tests run without the app. tests/Feature/.gitkeep removed; tests/Drift/.gitkeep remains until package 12. Package 3 replaces the placeholder core.blade.php (BoostDiscoveryTest only checks key and header, not content). Laravel 12 not run locally (only Testbench 11 installed); CI matrix covers it. D-1: diff and commit messages checked, only generic names (fixture project is `example/app`).
+
+## Decisions
+
+- Lowest Boost stays 2.10.0: the full suite passed on it (with Roster 1.0.0), so composer.json ^2.10 and the workflow 'lowest' pin are unchanged.
+- Boost registers in tests by setting env 'local' in defineEnvironment; no fallback binding of Boost singletons was needed (documented in TestCase).
+- BoostFixture::create accepts package lists as names or name => version; versions default to the installed version via Composer\InstalledVersions.
+- The pre-set enforce_tests=false case is a PHPUnit class test (ServiceProviderOwnEnforceTestsTest) with defineEnvironment; it also re-registers KitServiceProvider with force to prove the provider keeps false.
+- Added BoostDiscoveryTest cases checking that the 'tests' (enforce-tests) guideline renders only with enforceTests true, and that boost:update is registered.
+
+## Checks
+
+- `vendor/bin/pest`: exit 0, 17 passed (44 assertions) on Boost 2.10.4
+- `vendor/bin/pint --test`: exit 0, passed
