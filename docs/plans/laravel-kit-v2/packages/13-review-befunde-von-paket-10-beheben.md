@@ -2,7 +2,7 @@
 
 # Package 13: Review-Befunde von Paket 10 beheben
 
-Kind: fix · Status: running · Model: default · Effort: default · Commits: – · Verdict: –
+Kind: fix · Status: done · Model: default · Effort: default · Commits: none · Verdict: –
 
 ## Spec
 
@@ -29,3 +29,24 @@ The review of package 12 found blocking issues. Address each finding below. In y
 Non-blocking findings (no change needed for the verdict):
 2. tests/Feature/Commands/UpdateCommandTest.php:93-94: `expectsOutputToContain('+++ … (kit)')` proves the diff is printed in the interactive run. Laravel's PendingCommand does not enforce order against `expectsConfirmation`, so a regression that prints the diff after the question would still pass. The code prints it first.
 3. src/Hooks/DocsGuard.php:248-254: `git log --since` uses the committer date. When the agent rebases or amends during a turn, files from commits rewritten in the turn count as new, and the guard can block once. This fails safe (one extra block per turn, stop_hook_active lets the agent through) and is acceptable.
+
+## Report
+
+Der einzige blockierende Befund (AC-12: Liste der Kunden- und Projektnamen in den getrackten Plan-Specs unter docs/plans und damit in der Branch-Historie) lässt sich in einem Paket nicht beheben. docs/plans darf kein Paket editieren, und eine Historie darf ich nicht umschreiben. Ich habe deshalb keinen Code geändert. Pest läuft mit 196 passed, Pint ist sauber. Ausserhalb von docs/plans gibt es keinen Namenstreffer. Der einzige Treffer ist 'toweb GmbH' als Copyright-Inhaber in LICENSE:3, der Herausgeber des Pakets towebgmbh/laravel-kit.
+
+## Handoff
+
+Marked done by the owner
+
+## Decisions
+
+- Befund 1 (AC-12) nicht behoben: docs/plans darf kein Paket editieren und Historie umschreiben ist nicht Aufgabe eines Pakets; braucht Jarvis oder den Owner.
+- Befund 2 nicht behoben: PendingCommand erzwingt keine Reihenfolge, ein Test dafür wäre nicht aussagekräftig; der Code gibt den Diff vor der Frage aus.
+- Befund 3 nicht geändert: laut Review fail-safe und akzeptabel.
+- Kein Commit in diesem Paket, weil es nichts zu ändern gab.
+- LICENSE enthält 'toweb GmbH' als Copyright-Inhaber, das ist der Herausgeber des Pakets (Vendor towebgmbh) und kein Kundenname.
+
+## Checks
+
+- `vendor/bin/pest --compact`: exit 0, 196 passed (688 assertions)
+- `vendor/bin/pint --test`: exit 0, passed

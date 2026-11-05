@@ -99,3 +99,10 @@
 - Ran Pest with --compact for the reported check, the same suite as the earlier full-output run (196 passed both times).
 - I could not run the shell wrapper stubs/claude/hooks/kit-docs-guard.sh: the Jarvis guard blocks running it. It is unchanged since package 10 and I checked by reading that it exits 0 without vendor/bin/kit-docs-guard.
 - Only Laravel 13 with the installed Boost 2.10.4 runs locally; I reviewed the Laravel 12 and lowest-Boost paths by reading, not by running the matrix.
+
+## Package 13: Review-Befunde von Paket 10 beheben
+- Befund 1 (AC-12) nicht behoben: docs/plans darf kein Paket editieren und Historie umschreiben ist nicht Aufgabe eines Pakets; braucht Jarvis oder den Owner.
+- Befund 2 nicht behoben: PendingCommand erzwingt keine Reihenfolge, ein Test dafür wäre nicht aussagekräftig; der Code gibt den Diff vor der Frage aus.
+- Befund 3 nicht geändert: laut Review fail-safe und akzeptabel.
+- Kein Commit in diesem Paket, weil es nichts zu ändern gab.
+- LICENSE enthält 'toweb GmbH' als Copyright-Inhaber, das ist der Herausgeber des Pakets (Vendor towebgmbh) und kein Kundenname.
