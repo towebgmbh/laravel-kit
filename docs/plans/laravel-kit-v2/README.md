@@ -169,8 +169,8 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 3 | implement | Kit-Guidelines (Kern mit Grössenregel und Doku, Architektur, Konventionen, Qualität) und die zwei Overrides | done | opus | `7449fd6…585493f` | – |
 | 4 | implement | Stack-Varianten mit @scoped, Stack-Erkennung und Kontextbudget-Test | done | sonnet | `6024dda…c36e79d` | – |
 | 5 | implement | Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief | done | sonnet | `abef363…2490900` | – |
-| 6 | implement | Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle | running | opus | – | – |
-| 7 | implement | kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku | pending | opus | – | – |
+| 6 | implement | Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle | done | opus | `e87693e…47cb5c0` | – |
+| 7 | implement | kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku | running | opus | – | – |
 | 8 | implement | Claude-Stop-Hooks: Pint einmal pro Turn und struktureller Doku-Wächter | pending | opus | – | – |
 | 9 | implement | kit:update mit Diff und Rückfrage | pending | sonnet | – | – |
 | 10 | review | Review: Guidelines, Overrides, Stack, Budget, Install, Hooks und Update | pending | opus | – | – |

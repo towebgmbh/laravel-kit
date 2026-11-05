@@ -2,7 +2,7 @@
 
 # Package 6: Skills kit-onboard (beide Modi, Migration fremder Doku) und kit-docs-split mit Doku-Vorlagen und Projekt-Hülle
 
-Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: opus · Effort: medium · Commits: `e87693e…47cb5c0` · Verdict: –
 
 ## Spec
 
@@ -59,3 +59,31 @@ Serves: AC-9, AC-12
 
 - Writing flat docs into projects (package 7 `kit:install`).
 - Commands and hooks (packages 7 to 12).
+
+## Report
+
+Shipped kit-onboard (existing project with infer-conventions sweep, max 6-8 questions incl. architecture decision, record-rule with manual fallback, foreign-docs migration MERGE/MOVE/CONVERT/KEEP/ARCHIVE with dry run and confirmation; new project kickoff with Pest offer and project shell), kit-docs-split with five split templates, the onboard stubs (pint.json, tests.yml, ArchitectureTest.php.stub) and the flat doc stubs under stubs/docs/flat/. SkillDiscoveryTest now expects exactly the five kit skills; new OnboardStubsTest. Full suite 123 passed, Pint clean. Two commits: 73b956b, 47cb5c0.
+
+## Handoff
+
+Files: stubs/docs/flat/{GUIDELINES,SPECIFICATIONS,DECISIONS}.md with placeholders {{PROJECT_NAME}}, {{STACK}}, {{ARCHITECTURE}} (package 7 kit:install replaces them; no other placeholders, the rest are HTML comments). resources/boost/skills/kit-onboard/{SKILL.md, stubs/pint.json, stubs/tests.yml, stubs/ArchitectureTest.php.stub}; resources/boost/skills/kit-docs-split/{SKILL.md, templates/README.md, DOMAIN_README.md, DOMAIN_SPEC.md, CROSS_CUTTING.md, ADR.md}. Templates use {{PROJECT_NAME}}, {{DOMAIN}}, {{CONCERN}}, {{TITLE}} as fill-in markers for the agent (.md files are not Blade-rendered by Boost, only Markdown-formatted). kit-onboard reads the manifest key `project` and falls back to the D-23 migration rule; it archives migrated foreign docs to .ai/kit-upgrade/foreign/ (outside .ai/guidelines so Boost does not load them) and calls `php artisan kit:update` after installing Pest, so package 9 kit:update must add the pest/core override when Pest appears. kit-docs-split removes docs/GUIDELINES.md and docs/SPECIFICATIONS.md after the split (DECISIONS.md stays as index); kit:doctor/kit:upgrade should not assume GUIDELINES.md in split layout. The arch stub was run against Pest 5 (passes, vacuous for missing namespaces); APIs used: arch(), expect, not->toUse, not->toBeUsed, classes(), toHaveMethod. tests.yml reads the PHP version from composer.json via jq and runs `php artisan test --parallel --compact`; the skill tells PHPUnit projects to add brianium/paratest or drop --parallel. OnboardStubsTest uses Symfony\Component\Yaml (transitive via laravel/roster, not in require-dev). D-1: staged diff grepped against the name list from the package 13 spec, only hit is the package namespace Towebgmbh; commit messages generic.
+
+## Decisions
+
+- Foreign-docs ARCHIVE target is .ai/kit-upgrade/foreign/ (spec only said 'sources archived'); outside .ai/guidelines so Boost never loads them.
+- Agent instruction files searched: CLAUDE.md, AGENTS.md (outside the <laravel-boost-guidelines> block), GEMINI.md, .cursorrules, .cursor/rules/, .github/copilot-instructions.md, .junie/, .claude/commands/.
+- Quiet mode picks the architecture from code: Services only -> services, Actions only -> actions, both -> migrating; assumptions marked with <!-- assumption: ... --> in docs.
+- Manual record-rule fallback documented in Boost's format: .ai/rules file with frontmatter paths, # heading, ## title + note, plus a row in .ai/rules/index.md.
+- ArchitectureTest stub: shared rules once (controllers not using DB facade, App\Services not used) plus a marked domain block repeated per domain; 'no App\Services namespace' is expressed as not->toBeUsed().
+- tests.yml derives the PHP version from composer.json with jq, runs npm steps only when package.json exists (hashFiles), copies .env.example and generates a key; skill notes paratest for PHPUnit --parallel.
+- kit-docs-split deletes flat GUIDELINES.md and SPECIFICATIONS.md after every heading is mapped; DECISIONS.md becomes the ADR index.
+- Added kit-docs-split templates README.md (map) with {{PROJECT_NAME}} and DOMAIN_SPEC.md with status legend and Backlog section.
+- SkillDiscoveryTest constant renamed KIT_SKILLS_SO_FAR -> KIT_SKILLS.
+- OnboardStubsTest also asserts MERGE, ARCHIVE, 'Architecture decision' and 'php artisan boost:update' in kit-onboard.
+
+## Checks
+
+- `vendor/bin/pest tests/Feature/Skills`: exit 0, 32 passed
+- `vendor/bin/pest tests/Unit/TmpArchTest.php`: exit 0, arch stub with Billing: 3 passed on Pest 5 (temp file removed)
+- `vendor/bin/pest --compact`: exit 0, 123 passed (433 assertions)
+- `vendor/bin/pint --test`: exit 0, passed

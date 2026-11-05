@@ -2,7 +2,7 @@
 
 # Package 7: kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku
 
-Kind: implement · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 
