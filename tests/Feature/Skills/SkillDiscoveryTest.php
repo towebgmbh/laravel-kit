@@ -7,7 +7,7 @@ use Laravel\Roster\ProjectManager;
 use Tests\Support\BoostFixture;
 use Towebgmbh\LaravelKit\Kit;
 
-const KIT_SKILLS_SO_FAR = ['kit-brief', 'kit-review', 'kit-spec'];
+const KIT_SKILLS = ['kit-brief', 'kit-docs-split', 'kit-onboard', 'kit-review', 'kit-spec'];
 
 beforeEach(function () {
     $this->fixture = BoostFixture::create();
@@ -31,7 +31,7 @@ function kitSkills(BoostFixture $fixture)
 it('discovers the kit skills with descriptions', function () {
     $skills = kitSkills($this->fixture);
 
-    expect($skills->keys()->sort()->values()->all())->toBe(KIT_SKILLS_SO_FAR);
+    expect($skills->keys()->sort()->values()->all())->toBe(KIT_SKILLS);
 
     foreach ($skills as $skill) {
         expect($skill->description)->not->toBeEmpty();
@@ -45,7 +45,7 @@ it('records no skill parse failure', function () {
 });
 
 it('names every skill like its folder', function () {
-    foreach (KIT_SKILLS_SO_FAR as $folder) {
+    foreach (KIT_SKILLS as $folder) {
         $text = file_get_contents(Kit::path("resources/boost/skills/{$folder}/SKILL.md"));
 
         expect($text)->toContain("\nname: {$folder}\n");

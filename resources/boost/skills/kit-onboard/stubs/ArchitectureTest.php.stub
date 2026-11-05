@@ -1,0 +1,18 @@
+<?php
+
+// Architecture tests written by /kit-onboard. Repeat the domain block once per domain.
+
+arch('controllers do not query the database facade')
+    ->expect('App\Http\Controllers')
+    ->not->toUse('Illuminate\Support\Facades\DB');
+
+arch('no code uses an App\\Services namespace')
+    ->expect('App\Services')
+    ->not->toBeUsed();
+
+// domain: {{DOMAIN}}
+arch('{{DOMAIN}} actions have a handle method')
+    ->expect('App\{{DOMAIN}}\Actions')
+    ->classes()
+    ->toHaveMethod('handle');
+// end domain: {{DOMAIN}}
