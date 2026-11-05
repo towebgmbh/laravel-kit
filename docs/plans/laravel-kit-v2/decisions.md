@@ -47,3 +47,14 @@
 - Added kit-docs-split templates README.md (map) with {{PROJECT_NAME}} and DOMAIN_SPEC.md with status legend and Backlog section.
 - SkillDiscoveryTest constant renamed KIT_SKILLS_SO_FAR -> KIT_SKILLS.
 - OnboardStubsTest also asserts MERGE, ARCHIVE, 'Architecture decision' and 'php artisan boost:update' in kit-onboard.
+
+## Package 7: kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku
+- recordOverride is called for every applicable override even when the file was skipped as differing (the file still overrides the Boost text, so drift tracking stays useful); only the files entry is omitted for skipped files.
+- Summary table rows: boost.json ('package added' or 'unchanged'), each override, config/kit.php, docs, '.ai/kit-manifest.json' => 'saved'; skipped pest/core shows 'not needed'.
+- {{STACK}} in the flat docs is the readable label (e.g. 'Livewire 4 with Flux', public InstallCommand::STACK_LABELS); config/kit.php gets the raw value.
+- Unknown --stack or --architecture values fail with an error listing the allowed values; nothing is written before validation passes.
+- If boost:update fails, kit:install still prints the table but returns FAILURE with a hint to rerun boost:update (manifest is already saved).
+- Interactive project confirm also asks for the existing case ('This looks like an existing project. Is that right?'); answering no flips the type.
+- ProjectDetector ignores .gitkeep in database/migrations; it is an instance class like StackDetector, ComposerPackages::has is static as specified.
+- tests/TestCase setUp re-runs BoostServiceProvider::register() when RuleRepository is unbound (Boost singletons were missing in tests; package 2's env=local alone was not enough for boost:update).
+- Dropped a planned test that a foreign boost.json package survives: Boost's own install prunes uninstalled packages; duplicate-free packages are covered by the second-run test.

@@ -2,7 +2,7 @@
 
 # Package 8: Claude-Stop-Hooks: Pint einmal pro Turn und struktureller Doku-Wächter
 
-Kind: implement · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

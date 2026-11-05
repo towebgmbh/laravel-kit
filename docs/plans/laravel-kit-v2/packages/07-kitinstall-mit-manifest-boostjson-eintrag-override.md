@@ -2,7 +2,7 @@
 
 # Package 7: kit:install mit Manifest, boost.json-Eintrag, Overrides, Config und flacher Doku
 
-Kind: implement · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: opus · Effort: medium · Commits: `93da9af…4cb268d` · Verdict: –
 
 ## Spec
 
@@ -69,3 +69,36 @@ Serves: AC-2, AC-3, AC-4, AC-12
 
 - Claude hooks, `.claude/settings.json`, `DocsGuard` (package 8).
 - `kit:update` (package 9), `kit:upgrade` (package 11), `kit:doctor` (package 12).
+
+## Report
+
+kit:install is implemented. It checks for a valid boost.json, resolves the stack (option, StackDetector or prompt), the project type (--new/--existing, ProjectDetector or confirm) and the architecture. It adds the package to boost.json and writes the overrides (pest/core only when the project requires Pest). It creates config/kit.php from a stub and sets the running config when it created the file (D-40), and creates the flat docs for new projects. Then it saves the manifest, runs boost:update --no-discover and prints a summary table. New helpers: ComposerPackages, ProjectDetector, ManagedFiles. Full suite: 149 passed. Pint is clean.
+
+## Handoff
+
+Files: src/Console/InstallCommand.php (registered in KitServiceProvider), src/Support/{ComposerPackages,ProjectDetector,ManagedFiles}.php, stubs/config/kit.php.stub ({{STACK}}, {{ARCHITECTURE}}), tests/Feature/Commands/InstallCommandTest.php, tests/Unit/{ComposerPackages,ProjectDetector,ManagedFiles}Test.php.
+- Package 8: fill the protected hook InstallCommand::installAgentExtras(ManagedFiles $files). Read boost.json agents yourself (D-20). Record rows via $this->record($path, $result), which also prints the skip warning. ManagedFiles exposes manifest().
+- Package 9 (kit:update): reuse ManagedFiles. Its result constants are CREATED/UNCHANGED/REPLACED/SKIPPED/EXISTS. The confirm closure gets the relative path, so add the diff there or before the call. InstallCommand::STACK_LABELS and FLAT_DOCS are public constants.
+- Command instances are reused across artisan calls in tests, so reset any per-run state at the start of handle() (that was a real bug here with $results).
+- TEST HARNESS CHANGE: tests/TestCase::setUp re-runs BoostServiceProvider::register() when RuleRepository is not bound. Boost's register() sees the testing env, so its singletons (RuleRepository, GuidelineConfig, BoostManager) were missing, and boost:update/boost:install crashed in syncRuleFiles.
+- Boost writes CLAUDE.md/AGENTS.md relative to the CWD (ClaudeCode::guidelinesPath returns 'CLAUDE.md'). Tests that run boost:update must chdir() into the fixture and back to Kit::path() in afterEach, see kitInstallFixture(). Otherwise a CLAUDE.md lands in the package root.
+- Laravel Prompts only fall back to the console question helper (expectsConfirmation) when app env is 'testing'. The interactive test sets app()['env']='testing' after boot.
+- Boost's install drops packages from boost.json that are not installed in the project (a fake 'vendor/other' disappeared), so do not assert foreign package entries survive in fixtures.
+- D-1: staged diff checked against the package 13 name list, only hits are the Towebgmbh namespace; commit messages are generic.
+
+## Decisions
+
+- recordOverride is called for every applicable override even when the file was skipped as differing (the file still overrides the Boost text, so drift tracking stays useful); only the files entry is omitted for skipped files.
+- Summary table rows: boost.json ('package added' or 'unchanged'), each override, config/kit.php, docs, '.ai/kit-manifest.json' => 'saved'; skipped pest/core shows 'not needed'.
+- {{STACK}} in the flat docs is the readable label (e.g. 'Livewire 4 with Flux', public InstallCommand::STACK_LABELS); config/kit.php gets the raw value.
+- Unknown --stack or --architecture values fail with an error listing the allowed values; nothing is written before validation passes.
+- If boost:update fails, kit:install still prints the table but returns FAILURE with a hint to rerun boost:update (manifest is already saved).
+- Interactive project confirm also asks for the existing case ('This looks like an existing project. Is that right?'); answering no flips the type.
+- ProjectDetector ignores .gitkeep in database/migrations; it is an instance class like StackDetector, ComposerPackages::has is static as specified.
+- tests/TestCase setUp re-runs BoostServiceProvider::register() when RuleRepository is unbound (Boost singletons were missing in tests; package 2's env=local alone was not enough for boost:update).
+- Dropped a planned test that a foreign boost.json package survives: Boost's own install prunes uninstalled packages; duplicate-free packages are covered by the second-run test.
+
+## Checks
+
+- `vendor/bin/pest`: exit 0, 149 passed (550 assertions)
+- `vendor/bin/pint --test`: exit 0, passed
