@@ -147,3 +147,12 @@
 - Bash upgrade fixture is simpler than V1ProjectFixture (short project rule, plain hyphen in the services deviation line).
 - Name-search hits in docs/plans left untouched (read-only for packages); reported as the known blocker.
 - No commit message contains a name.
+
+## Package 18: Schluss-Review gegen alle Abnahmekriterien
+- Kept the verdict blocking for the AC-12 hits in docs/plans because the spec counts any hit as blocking. The code itself has no blocking finding.
+- Rated the README, doctor and resolver findings (2 to 5) as non-blocking: AC-11's sections are present and the behaviour follows D-27/D-30 as specified.
+- Reported the exit codes the Bash calls recorded (they end with echo). For the commit message search, grep's own exit was 1 (no match), as the summary says.
+- Extra search not listed in checks (its command exceeds the 500-character field): the name pattern over the tree and the code history (git log -p), both excluding docs/plans. Neither had a hit.
+- Tried to run one CI matrix cell (Laravel 12, Boost 2.10.0) in an ignored build/ copy. The Jarvis guard blocked git archive in a review turn, so the Laravel 12 and lowest-Boost cells were checked by reading only. Locally only PHP 8.5, Laravel 13 and Boost 2.10.4 ran.
+- Ran Pest with --compact --colors=never for the reported check; an earlier full-output run gave the same result (263 passed, 2 skipped).
+- Did not run the stubs/claude/hooks/kit-docs-guard.sh wrapper by hand. It is unchanged since package 10; the smoke test checks it is installed, and DocsGuardTest runs the binary.
