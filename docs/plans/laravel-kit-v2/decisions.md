@@ -163,3 +163,13 @@
 - Finding 5: no new resolver test, because ArchitectureResolverTest already covers 'missing section' => actions; added a command-level test for the label instead.
 - Finding 4: .claude/rules files still come from the *.md glob (as before), not from V1Inventory::paths(), so unknown project rules there still count as leftovers; the new check skips the rule paths of paths() to avoid duplicates.
 - D-1: I checked the diff and the commit message for customer names; none, the fixtures are generic.
+
+## Package 20: Paket 18 erneut reviewen
+- Kept the verdict blocking for AC-12 because the spec counts any hit of the name search as blocking; the code has no blocking finding and the fix needs Jarvis or the owner, not a code package.
+- Reviewed the package 19 diff line by line; re-verified the rest by re-running all checks incl. smoke instead of a full re-read, since code outside the diff is unchanged since package 18.
+- Re-ran the checks without a cd prefix because Jarvis could not match the first report; results were identical.
+- Ran the name search with -c (per-file counts) instead of -n; line numbers come from an earlier -n run in this review.
+- Ran the email search with docs/plans excluded so the plan text quoting the placeholder does not hide real hits; an earlier run without the exclusion found the same placeholder plus plan text only.
+- Rated the two new kit:doctor findings non-blocking: warnings only, exit 0 per D-27.
+- Only Laravel 13 / Boost 2.10.4 ran locally; the Laravel 12 and Boost 2.10.0 matrix cells and the GitHub workflows were not run.
+- Did not run the shell wrapper stub by hand; it is unchanged since package 10 and the smoke test installs it.

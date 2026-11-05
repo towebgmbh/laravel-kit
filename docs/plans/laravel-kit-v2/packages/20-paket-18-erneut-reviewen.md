@@ -2,7 +2,7 @@
 
 # Package 20: Paket 18 erneut reviewen
 
-Kind: review · Status: running · Model: opus · Effort: high · Commits: – · Verdict: –
+Kind: review · Status: done · Model: opus · Effort: high · Commits: none · Verdict: blocking
 
 ## Spec
 
@@ -59,3 +59,40 @@ None; this package only reviews.
 - Tagging and Packagist (D-17).
 
 Check that the findings of the previous review were fixed.
+
+## Report
+
+Re-reviewed package 19 (diff 637dcef..HEAD outside docs/plans: README.md, DoctorCommand, UpgradeCommand and two new tests) and re-ran every check of the final review. Findings 2 to 5 of package 18 are fixed. The README kit-brief row now matches the skill, the CLAUDE.md/AGENTS.md wording is correct, kit:doctor now also flags the v1 skills, the feature template and laravel-claude-kit/install.sh, and the upgrade labels a missing Deviations section as a default. All checks are green: composer validate, Pest (265 passed, 2 skipped as designed), drift test with KIT_BOOST_DRIFT=1 (2 passed), Pint clean, smoke (PASS: fresh, PASS: upgrade). Commit messages and the tree outside docs/plans have no name hits, and the email search only finds the test@example.com placeholder. The verdict stays blocking for one reason only: finding 1 of package 18 (AC-12). The name list is still in the tracked docs/plans/laravel-kit-v2 package specs, and only Jarvis or the owner can remove it. The code itself has no blocking finding.
+
+## Handoff
+
+Code state is ready for acceptance: Pest 265 passed / 2 skipped, drift 2 passed, Pint clean, composer validate ok, smoke PASS fresh and upgrade (Laravel 13, Boost pinned to 2.10.4). Package 18 findings 2-5 are fixed in af9a5d0. The only blocker left is AC-12. The name search hits only the tracked plan files docs/plans/laravel-kit-v2/packages/10, 11, 12, 14, 17, 18 and 20 (the name list in their check commands and quoted review text). No code package can fix this: docs/plans is read-only for packages. Before the first push or pull request, Jarvis or the owner must take docs/plans/laravel-kit-v2 (or at least the name list) out of the branch and squash or rewrite the history so no commit carries it. Then rerun `git grep` and the `git log --format=%B` search and expect no output. Two small non-blocking findings on kit:doctor's new leftover check can go to a follow-up or be accepted as they are (findings 2 and 3). Still not verified locally: the Laravel 12 and Boost 2.10.0 matrix cells and the GitHub workflows (they only run after a push).
+
+## Decisions
+
+- Kept the verdict blocking for AC-12 because the spec counts any hit of the name search as blocking; the code has no blocking finding and the fix needs Jarvis or the owner, not a code package.
+- Reviewed the package 19 diff line by line; re-verified the rest by re-running all checks incl. smoke instead of a full re-read, since code outside the diff is unchanged since package 18.
+- Re-ran the checks without a cd prefix because Jarvis could not match the first report; results were identical.
+- Ran the name search with -c (per-file counts) instead of -n; line numbers come from an earlier -n run in this review.
+- Ran the email search with docs/plans excluded so the plan text quoting the placeholder does not hide real hits; an earlier run without the exclusion found the same placeholder plus plan text only.
+- Rated the two new kit:doctor findings non-blocking: warnings only, exit 0 per D-27.
+- Only Laravel 13 / Boost 2.10.4 ran locally; the Laravel 12 and Boost 2.10.0 matrix cells and the GitHub workflows were not run.
+- Did not run the shell wrapper stub by hand; it is unchanged since package 10 and the smoke test installs it.
+
+## Checks
+
+- `pwd; export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; composer validate --strict`: exit 0, ./composer.json is valid
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; vendor/bin/pest --colors=never --compact`: exit 0, 265 passed, 2 skipped (drift without KIT_BOOST_DRIFT), 920 assertions
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; KIT_BOOST_DRIFT=1 vendor/bin/pest tests/Drift --colors=never`: exit 0, 2 passed (enforce-tests and pest/core match reference hashes)
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; vendor/bin/pint --test`: exit 0, passed
+- `export PATH="$HOME/Library/Application Support/Herd/bin:$PATH"; bash scripts/smoke.sh > /tmp/kit-smoke-review20b.log 2>&1`: exit 0, PASS: fresh, PASS: upgrade
+- `git grep -c -i -E "<name list>"`: exit 0, Hits only in docs/plans/laravel-kit-v2/packages 10 (5), 11 (1), 12 (5), 14 (6), 17 (4), 18 (4), 20 (2): finding 1
+- `git log --format=%B | grep -i -E "<name list>"`: exit 0, No output: no names in any commit message (the tool records the no-match grep as exit 0)
+- `git grep -n -E "[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[a-z]{2,}" -- ':!resources/legacy' ':!composer.json' ':!docs/plans'`: exit 0, Only tests/Unit/DocsGuardTest.php:203 test@example.com (placeholder)
+- `git grep -c -i -E "<name list>" -- . ':(exclude)docs/plans'; echo "outside-plans exit=$?"`: exit 0, No output outside docs/plans; git grep exit 1 (no match)
+
+## Findings
+
+1. [BLOCKING, AC-12 / D-1] `git grep -i -E "<name list>"` still finds hits, all in tracked plan files: docs/plans/laravel-kit-v2/packages/10-review-guidelines-overrides-stack-budget-install-h.md (lines 50, 51, 82, 83, 87), 11-review-befunde-von-paket-10-beheben.md:13, 12-paket-10-erneut-reviewen.md (50, 51, 94-96), 14-paket-10-erneut-reviewen.md (50, 51, 88-91), 17-rauchtest-an-frischer-laravel-13-app-install-und-v.md (52, 53, 82, 83), 18-schluss-review-gegen-alle-abnahmekriterien.md (52, 53, 85, 86), 20-paket-18-erneut-reviewen.md (52, 53). They are the name list inside check commands and review text. The tree outside docs/plans and all commit messages have no hit. A code package cannot fix this. Jarvis or the owner must remove the name list from the tracked files (or drop docs/plans/laravel-kit-v2 from the branch) and squash or rewrite the branch history before the first push or pull request, then rerun both searches with no output expected.
+2. [non-blocking, AC-8 usability] src/Console/DoctorCommand.php:145 always ends the leftover warning with "Run php artisan kit:upgrade." With the new check (lines 126-138), the warning also fires for v1 skills, the feature template or laravel-claude-kit/install.sh when .claude/.kit-version is missing. In that case kit:upgrade aborts with "No v1 kit found (.claude/.kit-version 1.0.0)." (src/Console/UpgradeCommand.php:37). Without the version file, name the manual fix instead, e.g. "Remove them or restore .claude/.kit-version and run php artisan kit:upgrade."
+3. [non-blocking, AC-8 accuracy] src/Console/DoctorCommand.php:126-132 counts any .claude/skills/{onboard,migrate,review,test,brief}/SKILL.md as a v1 leftover, whatever its content. A project's own skill with one of these generic names (for example `review`) gives a permanent false warning. Consider warning only when V1Inventory::has()/isUnchanged() matches, or when the file looks like a v1 kit skill.
