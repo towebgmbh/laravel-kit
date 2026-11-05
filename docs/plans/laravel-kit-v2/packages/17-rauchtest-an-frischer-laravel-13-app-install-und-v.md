@@ -2,7 +2,7 @@
 
 # Package 17: Rauchtest an frischer Laravel-13-App (Install und v1-Upgrade) als Skript und CI-Job
 
-Kind: implement · Status: pending · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

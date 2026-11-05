@@ -2,7 +2,7 @@
 
 # Package 16: kit:doctor, wöchentlicher Boost-Drift-Lauf und README
 
-Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: sonnet · Effort: medium · Commits: `3a4aef6…3400c51` · Verdict: –
 
 ## Spec
 
@@ -63,3 +63,27 @@ Serves: AC-8, AC-10, AC-11, AC-12
 - `scripts/smoke.sh` and the `smoke` CI job (package 13); README only names the script.
 - PHPStan/Larastan, reviewer subagents, browser checks (v2.1).
 - Tag and Packagist (D-17).
+
+## Report
+
+Added kit:doctor, the Boost drift test, the weekly drift workflow and the v2 README in one commit (3400c51). The full suite passes (263 passed, 2 skipped) and Pint is clean.
+
+## Handoff
+
+New: src/Console/DoctorCommand.php (registered in KitServiceProvider; [OK]/[WARN]/[FAIL] lines, exit 1 on any FAIL), tests/Feature/Commands/DoctorCommandTest.php, tests/Drift/BoostOverrideDriftTest.php, .github/workflows/boost-drift.yml. README.md rewritten with all required sections; it names scripts/smoke.sh, which does not exist yet (package 17). DoctorCommandTest installs the kit in a fixture, then sets the manifest hashes to the installed Boost, so it passes on any Boost version. For the smoke test: pin Boost to Overrides::BOOST_VERSION, kit:doctor should then exit 0; after the v1 upgrade it shows no v1 leftover warning; to get '[FAIL] Override drift', set a boost_sha256 in .ai/kit-manifest.json to 64 zeros (only fails on Boost at or above BOOST_VERSION). Watch: the drift test shows as skipped without KIT_BOOST_DRIFT=1; the weekly workflow only runs from the default branch. I ran the drift test once with an altered reference hash: it failed and named the Boost file, version and new hash. D-1: I checked diff and commit message; no client or project names.
+
+## Decisions
+
+- Renamed the helper fail() to failLine(), because Illuminate's Command already has a public fail().
+- Doctor also prints OK lines for the manifest and the config values. Boost not installed or below 2.10 is a FAIL.
+- An invalid manifest gives a FAIL line, as recommended in the earlier handoff; the drift check is skipped without a manifest.
+- A missing installed Boost file (hash null) counts as drift.
+- Removed tests/Drift/.gitkeep because the folder now has a test.
+- README describes the hooks as two Stop hooks (Pint and docs guard), per the plan, not PostToolUse.
+- I did not run the weekly workflow on GitHub; checked by reading only.
+
+## Checks
+
+- `vendor/bin/pest --compact --colors=never`: exit 0, 263 passed, 2 skipped
+- `KIT_BOOST_DRIFT=1 vendor/bin/pest tests/Drift --compact --colors=never`: exit 0, 2 passed on Boost 2.10.4
+- `vendor/bin/pint --test`: exit 0, passed

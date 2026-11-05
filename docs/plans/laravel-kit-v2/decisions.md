@@ -131,3 +131,12 @@
 - The report records the source of the stack too, not only the architecture.
 - Fixture: the services deviation line is inserted after the Deviations blockquote (the template's comment block stays); review SKILL.md changes the '# Code Review' heading; laravel-claude-kit also holds a README.md.
 - Extra tests beyond spec: other kit version, options override, unknown architecture, project rule target exists, kit copy without install.sh, invalid manifest.
+
+## Package 16: kit:doctor, wöchentlicher Boost-Drift-Lauf und README
+- Renamed the helper fail() to failLine(), because Illuminate's Command already has a public fail().
+- Doctor also prints OK lines for the manifest and the config values. Boost not installed or below 2.10 is a FAIL.
+- An invalid manifest gives a FAIL line, as recommended in the earlier handoff; the drift check is skipped without a manifest.
+- A missing installed Boost file (hash null) counts as drift.
+- Removed tests/Drift/.gitkeep because the folder now has a test.
+- README describes the hooks as two Stop hooks (Pint and docs guard), per the plan, not PostToolUse.
+- I did not run the weekly workflow on GitHub; checked by reading only.
