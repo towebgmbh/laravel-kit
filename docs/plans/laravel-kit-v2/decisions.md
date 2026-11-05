@@ -69,3 +69,10 @@
 - Added public const InstallCommand::DOCS_GUARD_SCRIPT and DocsGuard::REASON; install table gets a .claude/settings.json row with the merge result.
 - Extra tests beyond spec: MultiEdit and NotebookEdit paths, new Blade view, binary run via proc_open, invalid settings warning in kit:install, merge into existing settings in kit:install.
 - Skipped running the shell wrapper manually: the Jarvis guard blocks running scripts written via heredoc; the binary itself is covered by a test.
+
+## Package 9: kit:update mit Diff und Rückfrage
+- Used StrictUnifiedDiffOutputBuilder instead of UnifiedDiffOutputBuilder (not present in sebastian/diff 9).
+- ManagedFiles::write silently replaces files matching the manifest hash only when constructed with replaceUnmodified=true (kit:update); install behaviour unchanged.
+- kit:update also errors when boost.json is invalid, same as install.
+- The diff is printed whenever a changed file is encountered, including non-interactive runs, followed by the 'Skipped [path]: local changes kept.' warning.
+- Deleted pest/core is also dropped from manifest files, not just overrides.

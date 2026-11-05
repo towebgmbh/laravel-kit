@@ -2,7 +2,7 @@
 
 # Package 10: Review: Guidelines, Overrides, Stack, Budget, Install, Hooks und Update
 
-Kind: review · Status: pending · Model: opus · Effort: high · Commits: – · Verdict: –
+Kind: review · Status: running · Model: opus · Effort: high · Commits: – · Verdict: –
 
 ## Spec
 

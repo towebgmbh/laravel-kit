@@ -2,7 +2,7 @@
 
 # Package 9: kit:update mit Diff und Rückfrage
 
-Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: sonnet · Effort: medium · Commits: `64f1078…00627ed` · Verdict: –
 
 ## Spec
 
@@ -48,3 +48,24 @@ Serves: AC-5, AC-12
 ## Out of scope
 
 - `kit:upgrade` (package 11), `kit:doctor` and README (package 12), smoke script (package 13).
+
+## Report
+
+kit:update implemented and registered. It replaces unmodified managed files, prints a diff for edited ones and asks (skips without interaction, --force replaces), adds or removes the pest/core override with Pest, refreshes the hook script, settings, manifest and boost.json, then runs boost:update. Full suite 191 passed, Pint clean.
+
+## Handoff
+
+Files: src/Console/UpdateCommand.php (registered in KitServiceProvider), tests/Feature/Commands/UpdateCommandTest.php. ManagedFiles got a constructor arg replaceUnmodified (default false, install unchanged): when true, a file whose hash equals the manifest hash is replaced without asking. It also got deleteIfUnmodified(path). Diff uses sebastian/diff StrictUnifiedDiffOutputBuilder, because UnifiedDiffOutputBuilder no longer exists in v9 (Strict exists in 6 to 9). Header lines are '--- path (yours)' and '+++ path (kit)'. Package 12 doctor and package 11 upgrade can reuse this. kit:update does not touch config/kit.php or docs (D-22). It fails with FAILURE when boost.json is invalid. D-1: diff and commit message reviewed, no customer names; only the Towebgmbh namespace appears.
+
+## Decisions
+
+- Used StrictUnifiedDiffOutputBuilder instead of UnifiedDiffOutputBuilder (not present in sebastian/diff 9).
+- ManagedFiles::write silently replaces files matching the manifest hash only when constructed with replaceUnmodified=true (kit:update); install behaviour unchanged.
+- kit:update also errors when boost.json is invalid, same as install.
+- The diff is printed whenever a changed file is encountered, including non-interactive runs, followed by the 'Skipped [path]: local changes kept.' warning.
+- Deleted pest/core is also dropped from manifest files, not just overrides.
+
+## Checks
+
+- `vendor/bin/pest`: exit 0, 191 passed
+- `vendor/bin/pint --test`: exit 0, passed
