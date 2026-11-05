@@ -2,7 +2,7 @@
 
 # Package 4: Stack-Varianten mit @scoped, Stack-Erkennung und Kontextbudget-Test
 
-Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: done · Model: sonnet · Effort: medium · Commits: `6024dda…c36e79d` · Verdict: –
 
 ## Spec
 
@@ -58,3 +58,24 @@ Serves: AC-2, AC-12, AC-13
 
 - Using `StackDetector` in commands (packages 7 and 11).
 - Hints for Livewire 3 or Inertia 1/2 (concept Out of scope).
+
+## Report
+
+Added the stack guideline (five @scoped variants selected by kit.stack), StackDetector and the context budget test over 5 stacks x 3 modes x 2 doc layouts. Full suite passes (91 tests) and Pint is clean.
+
+## Handoff
+
+Files: resources/boost/guidelines/stack.blade.php (@switch on config('kit.stack'); one @scoped block per variant; unknown value renders nothing), src/Support/StackDetector.php (detect(basePath): ?string; null means ambiguous, so package 7 and 11 must ask or require an option), tests/Feature/Guidelines/{StackGuidelineTest,ContextBudgetTest}.php, tests/Unit/StackDetectorTest.php. The three KitGuidelinesTest snapshots were regenerated because the default stack (blade) now appears in the kit text. Each variant is about 6 to 8 lines, so the kit guidelines total roughly 90 lines, well under 200. The existing 150-line test in KitGuidelinesTest still passes; the 200 limit lives in ContextBudgetTest. Scoped entry shape: $entry['scoped'] holds one block, the test accepts either ['paths'=>...] or a plain list. Watch: the default kit.stack in config is blade. D-1: diff and commit message checked, only generic content.
+
+## Decisions
+
+- Default (missing) kit.stack config renders the blade variant because config/kit.php defaults to blade; unknown values render nothing.
+- StackDetector treats Inertia with both or neither JS adapter, and Livewire plus Inertia, as null (ambiguous), per spec.
+- StackDetector api rule: laravel/sanctum present and no .blade.php other than welcome.blade.php anywhere under resources/views (recursive).
+- Updated the three existing KitGuidelinesTest snapshots, since the stack section is now part of the kit text.
+- Budget test uses Kit::STACKS and Kit::ARCHITECTURES as datasets.
+
+## Checks
+
+- `vendor/bin/pest`: exit 0, 91 passed
+- `vendor/bin/pint --test`: exit 0, passed

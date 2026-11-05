@@ -2,7 +2,7 @@
 
 # Package 5: Skills kit-spec (Kriterien, Open Questions), kit-review und kit-brief
 
-Kind: implement · Status: pending · Model: sonnet · Effort: medium · Commits: – · Verdict: –
+Kind: implement · Status: running · Model: sonnet · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 

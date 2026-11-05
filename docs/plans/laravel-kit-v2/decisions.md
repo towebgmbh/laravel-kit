@@ -23,3 +23,10 @@
 - Added a split_threshold config test and a test that overrides render exactly once (not duplicated as user guidelines).
 - Overrides::stub() throws InvalidArgumentException for unknown paths; installedBoostIsOlderThanReference() returns false when the installed version is not numeric (e.g. dev-main).
 - core points to the test line with 'Follow the test line in the Test Enforcement rules.' instead of repeating it.
+
+## Package 4: Stack-Varianten mit @scoped, Stack-Erkennung und Kontextbudget-Test
+- Default (missing) kit.stack config renders the blade variant because config/kit.php defaults to blade; unknown values render nothing.
+- StackDetector treats Inertia with both or neither JS adapter, and Livewire plus Inertia, as null (ambiguous), per spec.
+- StackDetector api rule: laravel/sanctum present and no .blade.php other than welcome.blade.php anywhere under resources/views (recursive).
+- Updated the three existing KitGuidelinesTest snapshots, since the stack section is now part of the kit text.
+- Budget test uses Kit::STACKS and Kit::ARCHITECTURES as datasets.
