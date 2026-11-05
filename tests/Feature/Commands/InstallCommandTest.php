@@ -10,11 +10,11 @@ const KIT_INSTALL_BOOST_JSON = [
     'skills' => ['laravel-best-practices'],
 ];
 
-function kitInstallFixture(bool $pest = true, array $composerPackages = []): BoostFixture
+function kitInstallFixture(bool $pest = true, array $composerPackages = [], array $boostJson = KIT_INSTALL_BOOST_JSON): BoostFixture
 {
     $fixture = BoostFixture::create(
         composerPackages: $composerPackages,
-        boostJson: KIT_INSTALL_BOOST_JSON,
+        boostJson: $boostJson,
         pest: $pest,
     );
     $fixture->activate(app());
@@ -68,6 +68,7 @@ it('installs the kit into a new project with Pest', function () {
         ->and(array_keys($manifest['files']))->toEqualCanonicalizing([
             '.ai/guidelines/enforce-tests.blade.php',
             '.ai/guidelines/pest/core.blade.php',
+            '.claude/hooks/kit-docs-guard.sh',
         ])
         ->and($manifest['overrides'])->toHaveCount(2)
         ->and($manifest['overrides']['.ai/guidelines/pest/core.blade.php']['boost_file'])->toBe('.ai/pest/core.blade.php');
@@ -119,7 +120,7 @@ it('skips the Pest override in a project without Pest', function () {
 
     expect($f->path('.ai/guidelines/pest/core.blade.php'))->not->toBeFile()
         ->and($manifest['overrides'])->toHaveCount(1)
-        ->and($manifest['files'])->toHaveCount(1)
+        ->and($manifest['files'])->toHaveCount(2)
         ->and($claude)->not->toMatch('/^# Pest$/m')
         ->and($claude)->not->toContain('This project uses Pest')
         ->and($claude)->toContain('Follow the Laravel Kit test line:');
@@ -173,6 +174,8 @@ it('reports unchanged and existing files on a second run', function () {
             ['docs/GUIDELINES.md', 'exists'],
             ['docs/SPECIFICATIONS.md', 'exists'],
             ['docs/DECISIONS.md', 'exists'],
+            ['.claude/hooks/kit-docs-guard.sh', 'unchanged'],
+            ['.claude/settings.json', 'unchanged'],
             ['.ai/kit-manifest.json', 'saved'],
         ])
         ->assertSuccessful();
@@ -257,4 +260,69 @@ it('leaves an existing config untouched and warns when it differs', function () 
         ->assertSuccessful();
 
     expect(file_get_contents($this->fixture->path('config/kit.php')))->toBe("<?php return ['stack' => 'blade'];\n");
+});
+
+function kitStopCommands(BoostFixture $fixture): array
+{
+    return array_merge(...array_map(
+        fn (array $entry) => array_column($entry['hooks'], 'command'),
+        kitJson($fixture, '.claude/settings.json')['hooks']['Stop'] ?? [],
+    ));
+}
+
+it('installs the Claude Code Stop hooks', function () {
+    $this->fixture = kitInstallFixture();
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])->assertSuccessful();
+
+    $f = $this->fixture;
+    $script = $f->path('.claude/hooks/kit-docs-guard.sh');
+
+    expect($script)->toBeFile()
+        ->and(is_executable($script))->toBeTrue()
+        ->and(file_get_contents($script))->toBe(file_get_contents(Kit::path('stubs/claude/hooks/kit-docs-guard.sh')))
+        ->and(kitStopCommands($f))->toBe([
+            'vendor/bin/pint --dirty --format agent',
+            '"$CLAUDE_PROJECT_DIR"/.claude/hooks/kit-docs-guard.sh',
+        ])
+        ->and(kitJson($f, '.claude/settings.json')['hooks'])->not->toHaveKey('PostToolUse')
+        ->and(kitJson($f, '.ai/kit-manifest.json')['files'])->toHaveKey('.claude/hooks/kit-docs-guard.sh');
+});
+
+it('merges the hooks into existing Claude settings', function () {
+    $this->fixture = kitInstallFixture();
+    $this->fixture->put('.claude/settings.json', json_encode([
+        'permissions' => ['allow' => ['Bash(composer test)']],
+        'hooks' => ['PostToolUse' => [['matcher' => 'Edit', 'hooks' => [['type' => 'command', 'command' => 'npm run lint']]]]],
+    ]));
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])->assertSuccessful();
+
+    $settings = kitJson($this->fixture, '.claude/settings.json');
+
+    expect($settings['permissions']['allow'])->toBe(['Bash(composer test)'])
+        ->and(array_column($settings['hooks']['PostToolUse'][0]['hooks'], 'command'))->toBe(['npm run lint'])
+        ->and($settings['hooks']['PostToolUse'])->toHaveCount(1)
+        ->and(kitStopCommands($this->fixture))->toHaveCount(2);
+});
+
+it('warns about invalid Claude settings and leaves them alone', function () {
+    $this->fixture = kitInstallFixture();
+    $this->fixture->put('.claude/settings.json', '{"hooks": ');
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])
+        ->expectsOutputToContain('.claude/settings.json is not valid JSON; hooks were not added.')
+        ->assertSuccessful();
+
+    expect(file_get_contents($this->fixture->path('.claude/settings.json')))->toBe('{"hooks": ');
+});
+
+it('writes no Claude extras without the claude_code agent', function () {
+    $this->fixture = kitInstallFixture(boostJson: [...KIT_INSTALL_BOOST_JSON, 'agents' => ['codex']]);
+
+    $this->artisan('kit:install', ['--stack' => 'blade', '--new' => true, '--no-interaction' => true])->assertSuccessful();
+
+    expect($this->fixture->path('.claude/hooks/kit-docs-guard.sh'))->not->toBeFile()
+        ->and($this->fixture->path('.claude/settings.json'))->not->toBeFile()
+        ->and(kitJson($this->fixture, '.ai/kit-manifest.json')['files'])->not->toHaveKey('.claude/hooks/kit-docs-guard.sh');
 });

@@ -7,6 +7,7 @@ use Laravel\Boost\Support\Config as BoostConfig;
 use Towebgmbh\LaravelKit\Kit;
 use Towebgmbh\LaravelKit\Manifest;
 use Towebgmbh\LaravelKit\Overrides;
+use Towebgmbh\LaravelKit\Support\ClaudeSettings;
 use Towebgmbh\LaravelKit\Support\ComposerPackages;
 use Towebgmbh\LaravelKit\Support\ManagedFiles;
 use Towebgmbh\LaravelKit\Support\ProjectDetector;
@@ -36,6 +37,8 @@ class InstallCommand extends Command
     ];
 
     public const FLAT_DOCS = ['GUIDELINES.md', 'SPECIFICATIONS.md', 'DECISIONS.md'];
+
+    public const DOCS_GUARD_SCRIPT = '.claude/hooks/kit-docs-guard.sh';
 
     /** @var array<int, array{0: string, 1: string}> */
     protected array $results = [];
@@ -112,8 +115,29 @@ class InstallCommand extends Command
         return self::SUCCESS;
     }
 
-    /** Claude Code hooks and other agent extras; filled in by the hooks package. */
-    protected function installAgentExtras(ManagedFiles $files): void {}
+    /** Claude Code Stop hooks (Pint and the docs guard), only when boost.json has the claude_code agent. */
+    protected function installAgentExtras(ManagedFiles $files): void
+    {
+        if (! in_array('claude_code', (new BoostConfig)->getAgents(), true)) {
+            return;
+        }
+
+        $script = self::DOCS_GUARD_SCRIPT;
+        $result = $files->write($script, (string) file_get_contents(Kit::path('stubs/claude/hooks/kit-docs-guard.sh')));
+        $this->record($script, $result);
+
+        if ($result !== ManagedFiles::SKIPPED) {
+            chmod(base_path($script), 0755);
+        }
+
+        $settings = (new ClaudeSettings)->merge(base_path());
+
+        if ($settings === ClaudeSettings::INVALID) {
+            $this->warn(ClaudeSettings::PATH.' is not valid JSON; hooks were not added.');
+        }
+
+        $this->results[] = [ClaudeSettings::PATH, $settings];
+    }
 
     protected function resolveStack(string $basePath): ?string
     {
