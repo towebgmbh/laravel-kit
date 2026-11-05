@@ -186,6 +186,7 @@ Nutzer sind Entwickler, die Laravel-Projekte mit KI-Agenten bauen (Claude Code, 
 | 20 | review | Paket 18 erneut reviewen | done | opus | none | blocking |
 | 21 | fix | Review-Befunde von Paket 18 beheben | done | default | `4b5176a…44f08db` | – |
 | 22 | review | Paket 18 erneut reviewen | done | opus | none | blocking |
-| 23 | acceptance | Abnahme durch Simon | running | opus | – | – |
+| 23 | fix | Abnahme-Befunde beheben vor Abnahme durch Simon | running | default | – | – |
+| 24 | acceptance | Abnahme durch Simon | pending | opus | – | – |
 
 Each package's spec, report, handoff, decisions, checks and findings are in `packages/`; every reported decision is in `decisions.md`.

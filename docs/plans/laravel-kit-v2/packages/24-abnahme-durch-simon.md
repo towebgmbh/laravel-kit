@@ -1,8 +1,8 @@
 <!-- Jarvis maintains this file and overwrites it before every work package. Change the plan on the initiative page in Jarvis. -->
 
-# Package 23: Abnahme durch Simon
+# Package 24: Abnahme durch Simon
 
-Kind: acceptance · Status: running · Model: opus · Effort: medium · Commits: – · Verdict: –
+Kind: acceptance · Status: pending · Model: opus · Effort: medium · Commits: – · Verdict: –
 
 ## Spec
 
